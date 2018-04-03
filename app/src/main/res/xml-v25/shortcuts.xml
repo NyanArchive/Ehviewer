@@ -10,7 +10,7 @@
         android:shortcutDisabledMessage="@string/download_start_all">
         <intent
             android:action="start_all"
-            android:targetPackage="com.hippo.ehviewer"
+            android:targetPackage="com.hippo.ehviewer_mash"
             android:targetClass="com.hippo.ehviewer.shortcuts.ShortcutsActivity"/>
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
@@ -24,7 +24,7 @@
         android:shortcutDisabledMessage="@string/download_stop_all">
         <intent
             android:action="stop_all"
-            android:targetPackage="com.hippo.ehviewer"
+            android:targetPackage="com.hippo.ehviewer_mash"
             android:targetClass="com.hippo.ehviewer.shortcuts.ShortcutsActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
