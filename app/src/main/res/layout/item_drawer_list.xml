@@ -5,26 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground"
+    android:minHeight="?attr/listPreferredItemHeightSmall">
 
     <TextView
         android:id="@+id/tv_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:textColor="?android:attr/textColorPrimary"
         android:textAppearance="?attr/textAppearanceListItemSmall"
-        android:layout_gravity="center_vertical"
-        android:paddingLeft="?attr/listPreferredItemPaddingLeft"/>
+        android:gravity="center_vertical"
+        android:paddingLeft="?attr/listPreferredItemPaddingLeft"
+        android:background="?android:attr/selectableItemBackground"/>
 
 
     <ImageView
         android:id="@+id/iv_option"
         app:srcCompat="@drawable/ic_more_vert_black_24dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:paddingLeft="?attr/listPreferredItemPaddingLeft"
         android:paddingRight="?attr/listPreferredItemPaddingRight"
         android:background="?attr/selectableItemBackgroundBorderless"/>
