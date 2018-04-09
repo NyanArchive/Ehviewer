@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,11 +70,12 @@ public final class CommonOperations {
 
     private static final class UpdateTask extends AsyncTask<Void, Void, JSONObject> {
 
+        @SuppressLint("StaticFieldLeak")
         private final Activity mActivity;
         private final OkHttpClient mHttpClient;
         private final boolean mFeedback;
 
-        public UpdateTask(Activity activity, boolean feedback) {
+        private UpdateTask(Activity activity, boolean feedback) {
             mActivity = activity;
             mHttpClient = EhApplication.getOkHttpClient(activity);
             mFeedback = feedback;
@@ -91,7 +93,10 @@ public final class CommonOperations {
                 Log.d(TAG, url);
                 Request request = new Request.Builder().url(url).build();
                 Response response = mHttpClient.newCall(request).execute();
-                return new JSONObject(response.body().string());
+                if (response.isSuccessful()){
+                    return new JSONObject(response.body().string());
+                }
+                return null;
             } catch (IOException e) {
                 return null;
             } catch (JSONException e) {
