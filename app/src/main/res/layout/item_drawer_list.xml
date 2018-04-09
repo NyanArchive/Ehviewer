@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="?android:attr/selectableItemBackground"
-    android:minHeight="?attr/listPreferredItemHeightSmall">
+    android:minHeight="?attr/listPreferredItemHeightSmall"
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/tv_key"
