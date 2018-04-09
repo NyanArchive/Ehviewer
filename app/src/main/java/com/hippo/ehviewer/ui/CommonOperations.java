@@ -86,9 +86,9 @@ public final class CommonOperations {
             try {
                 String url;
                 if (Settings.getBetaUpdateChannel()) {
-                    url = "http://www.ehviewer.com/update_beta.json";
+                    url = "https://raw.githubusercontent.com/onlymash/EhViewer/master-mash/app/update_beta.json";
                 } else {
-                    url = "http://www.ehviewer.com/update.json";
+                    url = "https://raw.githubusercontent.com/onlymash/EhViewer/master-mash/app/update.json";
                 }
                 Log.d(TAG, url);
                 Request request = new Request.Builder().url(url).build();
