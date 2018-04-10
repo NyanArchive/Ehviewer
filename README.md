@@ -1,41 +1,12 @@
-[![Telegram](https://img.shields.io/badge/chat-Telegram-blue.svg)](https://t.me/ehviewer) [![G+](https://img.shields.io/badge/chat-G%2B-red.svg)](https://plus.google.com/communities/103823982034655188459)
-
 # EhViewer
 
-![Icon](art/launcher_icon-web.png)
-
-这是一个 E-Hentai Android 平台的浏览器。
-
-An E-Hentai Application for Android.
-
+An [EhViewer](https://github.com/seven332/EhViewer) forked version, support night mode, improved drawer layout.
 
 # Screenshot
 
-![screenshot-01](art/screenshot-01.png)
-
-
-# Build
-
-Windows
-
-    > git clone https://github.com/seven332/EhViewer
-    > cd EhViewer
-    > gradlew app:assembleDebug
-
-Linux
-
-    $ git clone https://github.com/seven332/EhViewer
-    $ cd EhViewer
-    $ ./gradlew app:assembleDebug
-
-生成的 apk 文件在 app\build\outputs\apk 目录下
-
-The apk is in app\build\outputs\apk
-
+![screenshot-01](art/screenshot.jpg)
 
 # Thanks
-
-本项目受到了诸多开源项目的帮助
 
 Here is the libraries
 
