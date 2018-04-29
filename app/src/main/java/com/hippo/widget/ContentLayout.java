@@ -95,6 +95,7 @@ public class ContentLayout extends FrameLayout {
         drawable.setColor(ResourcesUtils.getAttrColor(context, R.attr.colorAccent));
         mFastScroller.setHandlerDrawable(drawable);
 
+        mRefreshLayout.setHeaderProgressBackgroundColorSchemeColor(getResources().getColor(R.color.background));
         mRefreshLayout.setHeaderColorSchemeResources(
                 R.color.loading_indicator_red,
                 R.color.loading_indicator_purple,
