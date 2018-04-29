@@ -178,6 +178,7 @@
         android:layout_height="match_parent"
         android:background="@color/translucent_bg"
         android:clickable="true"
+        android:focusable="true"
         android:visibility="gone">
 
         <com.hippo.widget.ProgressView
