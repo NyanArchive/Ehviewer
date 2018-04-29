@@ -21,7 +21,8 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
-import com.google.analytics.tracking.android.EasyTracker;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.hippo.app.AppCompatPreferenceActivity;
 import com.hippo.content.ContextLocalWrapper;
 import com.hippo.ehviewer.EhApplication;
@@ -51,7 +52,7 @@ public abstract class EhPreferenceActivity extends AppCompatPreferenceActivity {
         super.onStart();
 
         if (Settings.getEnableAnalytics()) {
-            EasyTracker.getInstance(this).activityStart(this);
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(true);
             mTrackStarted = true;
         }
     }
@@ -61,7 +62,7 @@ public abstract class EhPreferenceActivity extends AppCompatPreferenceActivity {
         super.onStop();
 
         if (mTrackStarted) {
-            EasyTracker.getInstance(this).activityStop(this);
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
             mTrackStarted = false;
         }
     }

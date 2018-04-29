@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "63195197320",
+    "firebase_url": "https://ehviewer-android.firebaseio.com",
+    "project_id": "ehviewer-android",
+    "storage_bucket": "ehviewer-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63195197320:android:583086f808b6af03",
+        "android_client_info": {
+          "package_name": "com.hippo.ehviewer_mash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "63195197320-dth0882cg0c70nprcie19at18ik7j5ie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hippo.ehviewer_mash",
+            "certificate_hash": "a96d1bd5f3a9fc4f82dff8ee91865184284ecdc8"
+          }
+        },
+        {
+          "client_id": "63195197320-tsndtgkjumqaarug82o8fitmm235b6kd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ2no-EAIKRHvzhmy3qDU-ywoROPuBM-M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63195197320-tsndtgkjumqaarug82o8fitmm235b6kd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63195197320:android:2dbe23a4b7386a9b",
+        "android_client_info": {
+          "package_name": "com.hippo.ehviewer_mash.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "63195197320-gam2dqm9auu82tqf2ifrg5ppvbmm697q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hippo.ehviewer_mash.debug",
+            "certificate_hash": "de67bb7a43a01ad200c9d05fb31c6409bbdab729"
+          }
+        },
+        {
+          "client_id": "63195197320-vddmoidvahuto9aleljqgvi65cuo3sno.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hippo.ehviewer_mash.debug",
+            "certificate_hash": "a96d1bd5f3a9fc4f82dff8ee91865184284ecdc8"
+          }
+        },
+        {
+          "client_id": "63195197320-tsndtgkjumqaarug82o8fitmm235b6kd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ2no-EAIKRHvzhmy3qDU-ywoROPuBM-M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63195197320-tsndtgkjumqaarug82o8fitmm235b6kd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

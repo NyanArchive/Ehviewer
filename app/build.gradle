@@ -73,6 +73,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:appcompat-v7:$supportLibrary"
     implementation "com.android.support:design:$supportLibrary"
+    implementation 'com.google.firebase:firebase-core:12.0.1'
     implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
     implementation 'com.github.seven332:android-recaptcha:2bbb3459a8'
     implementation 'com.github.seven332:animator:0.1.0'
@@ -113,3 +114,5 @@ configurations.all {
         exclude group: 'com.github.seven332', module: 'okhttp'
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
