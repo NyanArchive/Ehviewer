@@ -24,6 +24,6 @@
 
     <path
         android:pathData="@string/pd_chart"
-        android:fillColor="?attr/colorAccent"/>
+        android:fillColor="?android:attr/colorAccent"/>
 
 </vector>

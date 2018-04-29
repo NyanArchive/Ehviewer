@@ -120,11 +120,11 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
                 android:gravity="bottom"
-                style="?attr/buttonBarStyle">
+                style="?android:attr/buttonBarStyle">
 
                 <Button
                     android:id="@+id/register"
-                    style="?attr/buttonBarNegativeButtonStyle"
+                    style="?android:attr/buttonBarNegativeButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -133,7 +133,7 @@
 
                 <Button
                     android:id="@+id/sign_in"
-                    style="?attr/buttonBarPositiveButtonStyle"
+                    style="?android:attr/buttonBarPositiveButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -150,7 +150,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="8dp"
                 android:text="@string/sign_in_via_webview"
-                android:textColor="?attr/colorAccent"/>
+                android:textColor="?android:attr/colorAccent"/>
 
             <TextView
                 android:id="@+id/sign_in_via_cookies"
@@ -159,7 +159,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="8dp"
                 android:text="@string/sign_in_via_cookies"
-                android:textColor="?attr/colorAccent"/>
+                android:textColor="?android:attr/colorAccent"/>
 
             <TextView
                 android:id="@+id/skip_signing_in"
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/skip_signing_in"
-                android:textColor="?attr/colorAccent"/>
+                android:textColor="?android:attr/colorAccent"/>
 
         </LinearLayout>
     </ScrollView>

@@ -32,9 +32,9 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="?attr/dialogPreferredPadding"
+            android:paddingLeft="?android:attr/dialogPreferredPadding"
             android:paddingTop="@dimen/abc_dialog_padding_top_material"
-            android:paddingRight="?attr/dialogPreferredPadding"/>
+            android:paddingRight="?android:attr/dialogPreferredPadding"/>
 
     </com.hippo.widget.IndicatingScrollView>
 
@@ -42,8 +42,8 @@
         android:id="@+id/checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="?attr/dialogPreferredPadding"
+        android:layout_marginLeft="?android:attr/dialogPreferredPadding"
         android:layout_marginTop="@dimen/abc_dialog_padding_top_material"
-        android:layout_marginRight="?attr/dialogPreferredPadding"/>
+        android:layout_marginRight="?android:attr/dialogPreferredPadding"/>
 
 </LinearLayout>

@@ -77,7 +77,7 @@
                 android:id="@+id/drag_handler"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:background="?attr/colorAccent"/>
+                android:background="?android:attr/colorAccent"/>
 
         </LinearLayout>
 

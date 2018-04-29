@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    style="?attr/buttonBarStyle">
+    style="?android:attr/buttonBarStyle">
 
     <Button
         android:id="@+id/action"
@@ -28,7 +28,7 @@
         android:layout_weight="1"
         android:textColor="@color/primary_icon"
         android:textStyle="bold"
-        style="?attr/buttonBarPositiveButtonStyle"/>
+        style="?android:attr/buttonBarPositiveButtonStyle"/>
 
     <Space
         android:layout_width="0dp"

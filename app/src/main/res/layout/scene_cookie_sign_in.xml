@@ -133,7 +133,7 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:gravity="bottom"
-        style="?attr/buttonBarStyle">
+        style="?android:attr/buttonBarStyle">
 
         <View
             android:layout_width="0dp"
@@ -142,11 +142,11 @@
 
         <Button
             android:id="@+id/ok"
-            style="?attr/buttonBarPositiveButtonStyle"
+            style="?android:attr/buttonBarPositiveButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="?attr/colorAccent"
+            android:textColor="?android:attr/colorAccent"
             android:textStyle="bold"
             android:text="@android:string/ok"/>
 

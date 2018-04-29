@@ -19,8 +19,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="?attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?attr/listPreferredItemPaddingRight"
+    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:orientation="vertical">
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:textAppearance="?attr/textAppearanceListItemSmall"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/text_little_small"/>
 
@@ -38,7 +38,7 @@
         android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceListItemSmall"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="@dimen/text_small"/>
 

@@ -70,11 +70,11 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:gravity="bottom"
-        style="?attr/buttonBarStyle">
+        style="?android:attr/buttonBarStyle">
 
         <Button
             android:id="@+id/cancel"
-            style="?attr/buttonBarNegativeButtonStyle"
+            style="?android:attr/buttonBarNegativeButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -82,7 +82,7 @@
 
         <Button
             android:id="@+id/set"
-            style="?attr/buttonBarPositiveButtonStyle"
+            style="?android:attr/buttonBarPositiveButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

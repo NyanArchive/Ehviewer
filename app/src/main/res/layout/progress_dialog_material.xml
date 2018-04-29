@@ -25,9 +25,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:baselineAligned="false"
-        android:paddingLeft="?attr/dialogPreferredPadding"
+        android:paddingLeft="?android:attr/dialogPreferredPadding"
         android:paddingTop="@dimen/dialog_padding_top_material"
-        android:paddingRight="?attr/dialogPreferredPadding"
+        android:paddingRight="?android:attr/dialogPreferredPadding"
         android:paddingBottom="@dimen/dialog_padding_top_material">
 
         <ProgressBar
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:max="10000"
-            android:layout_marginRight="?attr/dialogPreferredPadding" />
+            android:layout_marginRight="?android:attr/dialogPreferredPadding" />
 
         <TextView
             android:id="@+id/message"

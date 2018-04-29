@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
@@ -14,9 +14,9 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:textColor="?android:attr/textColorPrimary"
-        android:textAppearance="?attr/textAppearanceListItemSmall"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:gravity="center_vertical"
-        android:paddingLeft="?attr/listPreferredItemPaddingLeft"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
         android:background="?android:attr/selectableItemBackground"/>
 
 
@@ -26,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:paddingLeft="?attr/listPreferredItemPaddingLeft"
-        android:paddingRight="?attr/listPreferredItemPaddingRight"
-        android:background="?attr/selectableItemBackgroundBorderless"/>
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+        android:background="?android:attr/selectableItemBackgroundBorderless"/>
 
 </LinearLayout>

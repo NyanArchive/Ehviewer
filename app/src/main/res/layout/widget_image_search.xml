@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/select_image"
-        style="?attr/buttonBarButtonStyle"/>
+        style="?android:attr/buttonBarButtonStyle"/>
 
     <TableLayout
         android:layout_width="match_parent"
