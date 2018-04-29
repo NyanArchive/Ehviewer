@@ -15,37 +15,42 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/card_selected">
+    style="@style/Custom.Widget.CardView">
 
-    <com.hippo.ehviewer.widget.TileThumb
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/thumb"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        android:foreground="@drawable/tile_background"
-        app:retryType="none"/>
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/category"
-        android:layout_width="32dp"
-        android:layout_height="24dp"
-        android:layout_gravity="top|right"/>
+        <com.hippo.ehviewer.widget.TileThumb
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/thumb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:foreground="@drawable/tile_background"
+            app:retryType="none"/>
 
-    <TextView
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/simple_language"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|right"
-        android:layout_marginRight="2dp"
-        android:textSize="10dp"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        tools:ignore="SpUsage"/>
+        <TextView
+            android:id="@+id/category"
+            android:layout_width="32dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|right"/>
 
-</FrameLayout>
+        <TextView
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/simple_language"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:layout_marginRight="2dp"
+            android:textSize="10dp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            tools:ignore="SpUsage"/>
+
+    </FrameLayout>
+</android.support.v7.widget.CardView>

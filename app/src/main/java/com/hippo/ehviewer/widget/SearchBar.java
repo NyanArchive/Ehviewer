@@ -111,7 +111,6 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
     }
 
     private void init(Context context) {
-        setBackgroundResource(R.drawable.card);
 
         mSearchDatabase = SearchDatabase.getInstance(getContext());
 

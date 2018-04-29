@@ -23,7 +23,7 @@
 
     <!-- Progress View -->
     <style name="ProgressView">
-        <item name="color">?attr/colorAccent</item>
+        <item name="color">@color/colorAccent</item>
         <item name="indeterminate">true</item>
         <item name="android:minWidth">48dp</item>
         <item name="android:minHeight">48dp</item>
@@ -95,13 +95,13 @@
     </style>
 
     <style name="ButtonInCard.Accent">
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
     <style name="Slider">
         <item name="thickness">2dp</item>
         <item name="radius">6dp</item>
-        <item name="color">?attr/colorAccent</item>
+        <item name="color">@color/colorAccent</item>
         <item name="textColor">@android:color/white</item>
         <item name="textSize">12sp</item>
         <item name="dark">false</item>
@@ -143,5 +143,9 @@
         <item name="colorControlNormal">@color/grey_400</item>
     </style>
 
+    <style name="Custom.Widget.CardView" parent="CardView">
+        <item name="cardCornerRadius">4dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
 
 </resources>

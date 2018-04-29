@@ -40,6 +40,7 @@
     <color name="background">@color/background_light</color>
     <color name="background_dark">#ff303030</color>
     <color name="background_light">#fffafafa</color>
+    <color name="foreground_selected">#24000000</color>
 
     <color name="red_500">#fff44336</color>
     <color name="teal_500">#ff009688</color>
@@ -121,16 +122,6 @@
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
-
-    <!--Card color-->
-    <color name="card_shadow_1">#00CCCCCC</color>
-    <color name="card_shadow_2">#10CCCCCC</color>
-    <color name="card_shadow_3">#20CCCCCC</color>
-    <color name="card_shadow_4">#30CCCCCC</color>
-    <color name="card_shadow_5">#50CCCCCC</color>
-
-    <color name="card_bg">@android:color/white</color>
-    <color name="card_selected_bg">@color/grey_400</color>
 
     <color name="primary_icon">@color/colorPrimary</color>
 </resources>
