@@ -40,7 +40,10 @@
             android:layout_gravity="left"
             android:maxWidth="@dimen/drawer_max_width"
             app:headerLayout="@layout/nav_header_main"
-            app:menu="@menu/nav_drawer_main"/>
+            app:menu="@menu/nav_drawer_main"
+            app:itemIconTint="@color/selectable_item_icon"
+            app:itemTextColor="@color/selectable_item_text"
+            app:itemBackground="@drawable/selectable_item_background"/>
 
         <com.hippo.ehviewer.widget.EhDrawerView
             android:id="@+id/right_drawer"
