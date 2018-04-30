@@ -972,21 +972,6 @@ public class Settings {
     }
 
     /********************
-     ****** Crash
-     ********************/
-    private static final String KEY_CRASH_FILENAME = "crash_filename";
-    private static final String DEFAULT_CRASH_FILENAME = null;
-
-    public static String getCrashFilename() {
-        return getString(KEY_CRASH_FILENAME, DEFAULT_CRASH_FILENAME);
-    }
-
-    @SuppressLint("CommitPrefEdits")
-    public static void putCrashFilename(String value) {
-        sSettingsPre.edit().putString(KEY_CRASH_FILENAME, value).commit();
-    }
-
-    /********************
      ****** Advanced
      ********************/
     public static final String KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body";
