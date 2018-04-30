@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui.scene;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.hippo.ehviewer.Crash;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.scene.Announcer;
@@ -51,11 +50,6 @@ public class SolidScene extends BaseScene {
             case CHECK_STEP_WARNING:
                 if (Settings.getAskAnalytics()) {
                     startScene(new Announcer(AnalyticsScene.class).setArgs(args));
-                    break;
-                }
-            case CHECK_STEP_ANALYTICS:
-                if (Crash.hasCrashFile()) {
-                    startScene(new Announcer(CrashScene.class).setArgs(args));
                     break;
                 }
             case CHECK_STEP_CRASH:

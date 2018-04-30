@@ -19,9 +19,11 @@ package com.hippo.ehviewer;
 import android.app.Activity;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Debug;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
@@ -57,7 +59,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 
-public class EhApplication extends RecordingApplication implements Thread.UncaughtExceptionHandler {
+public class EhApplication extends RecordingApplication implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TAG = EhApplication.class.getSimpleName();
 
@@ -68,8 +70,6 @@ public class EhApplication extends RecordingApplication implements Thread.Uncaug
     private static final boolean DEBUG_PRINT_NATIVE_MEMORY = false;
     private static final boolean DEBUG_PRINT_IMAGE_COUNT = false;
     private static final long DEBUG_PRINT_INTERVAL = 3000L;
-
-    private Thread.UncaughtExceptionHandler mDefaultHandler;
 
     private final IntIdGenerator mIdGenerator = new IntIdGenerator();
     private final HashMap<Integer, Object> mGlobalStuffMap = new HashMap<>();
@@ -87,10 +87,6 @@ public class EhApplication extends RecordingApplication implements Thread.Uncaug
 
     @Override
     public void onCreate() {
-        // Prepare to catch crash
-        mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(this);
-
         super.onCreate();
 
         GetText.initialize(this);
@@ -139,12 +135,26 @@ public class EhApplication extends RecordingApplication implements Thread.Uncaug
         if (DEBUG_PRINT_NATIVE_MEMORY || DEBUG_PRINT_IMAGE_COUNT) {
             debugPrint();
         }
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.registerOnSharedPreferenceChangeListener(this);
     }
 
     private void setNightMode(){
-        int mode = Settings.getNightMode();
-        if (AppCompatDelegate.getDefaultNightMode() != mode){
-            AppCompatDelegate.setDefaultNightMode(mode);
+        String mode = Settings.getNightMode();
+        switch (mode) {
+            case "system":
+               AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+               break;
+            case "auto":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                break;
+            case "off":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "on":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
         }
     }
 
@@ -332,26 +342,10 @@ public class EhApplication extends RecordingApplication implements Thread.Uncaug
         }
         try {
             ex.printStackTrace();
-            Crash.saveCrashInfo2File(this, ex);
             return true;
         } catch (Throwable tr) {
             return false;
         }
-    }
-
-    @Override
-    public void uncaughtException(Thread thread, Throwable ex) {
-        if (!handleException(ex) && mDefaultHandler != null) {
-            mDefaultHandler.uncaughtException(thread, ex);
-        }
-
-        Activity activity = getTopActivity();
-        if (activity != null) {
-            activity.finish();
-        }
-
-        android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(1);
     }
 
     @NonNull
@@ -373,6 +367,14 @@ public class EhApplication extends RecordingApplication implements Thread.Uncaug
             return mActivityList.get(mActivityList.size() - 1);
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Settings.KEY_NIGHT_MODE.equals(key)) {
+            setNightMode();
+            recreate();
         }
     }
 }

@@ -44,7 +44,7 @@
         android:summary="%s"
         app:entries="@array/night_mode_entries"
         app:entryValues="@array/night_mode_entry_values"
-        android:defaultValue="1"/>
+        android:defaultValue="system"/>
 
     <com.hippo.preference.ListPreference
         android:key="list_mode"

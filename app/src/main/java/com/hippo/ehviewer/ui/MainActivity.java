@@ -42,7 +42,6 @@ import android.widget.Toast;
 
 import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.Crash;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhUrlOpener;
@@ -51,7 +50,6 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.ui.scene.AnalyticsScene;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.ehviewer.ui.scene.CookieSignInScene;
-import com.hippo.ehviewer.ui.scene.CrashScene;
 import com.hippo.ehviewer.ui.scene.DownloadsScene;
 import com.hippo.ehviewer.ui.scene.FavoritesScene;
 import com.hippo.ehviewer.ui.scene.GalleryCommentsScene;
@@ -115,7 +113,6 @@ public final class MainActivity extends StageActivity
         registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(WarningScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(AnalyticsScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
-        registerLaunchMode(CrashScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(SignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(WebViewSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(CookieSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -145,8 +142,6 @@ public final class MainActivity extends StageActivity
             return new Announcer(WarningScene.class);
         } else if (Settings.getAskAnalytics()) {
             return new Announcer(AnalyticsScene.class);
-        } else if (Crash.hasCrashFile()) {
-            return new Announcer(CrashScene.class);
         } else if (EhUtils.needSignedIn(this)) {
             return new Announcer(SignInScene.class);
         } else if (Settings.getSelectSite()) {
@@ -176,11 +171,6 @@ public final class MainActivity extends StageActivity
                 newArgs.putString(AnalyticsScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(AnalyticsScene.KEY_TARGET_ARGS, announcer.getArgs());
                 return new Announcer(AnalyticsScene.class).setArgs(newArgs);
-            } else if (Crash.hasCrashFile()) {
-                Bundle newArgs = new Bundle();
-                newArgs.putString(CrashScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
-                newArgs.putBundle(CrashScene.KEY_TARGET_ARGS, announcer.getArgs());
-                return new Announcer(CrashScene.class).setArgs(newArgs);
             } else if (EhUtils.needSignedIn(this)) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.getClazz().getName());

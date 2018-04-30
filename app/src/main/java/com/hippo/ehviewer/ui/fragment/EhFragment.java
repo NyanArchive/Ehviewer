@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.widget.Toast;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -60,9 +59,6 @@ public class EhFragment extends PreferenceFragment
         } else if (Settings.KEY_THUMB_SIZE.equals(key)) {
             getActivity().setResult(Activity.RESULT_OK);
         } else if (Settings.KEY_NIGHT_MODE.equals(key)) {
-            Toast.makeText(getActivity(),
-                    getString(R.string.settings_eh_night_mode_restart_effective),
-                    Toast.LENGTH_SHORT).show();
             getActivity().setResult(Activity.RESULT_OK);
         }
         return true;
