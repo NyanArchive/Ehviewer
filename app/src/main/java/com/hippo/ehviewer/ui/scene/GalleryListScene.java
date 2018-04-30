@@ -308,16 +308,10 @@ public final class GalleryListScene extends BaseScene
 
     private void setSearchBarHint(Context context, SearchBar searchBar) {
         Resources resources = context.getResources();
-        Drawable searchImage = DrawableManager.getDrawable(context, R.drawable.v_magnify_x24);
         SpannableStringBuilder ssb = new SpannableStringBuilder("   ");
         ssb.append(resources.getString(EhUrl.SITE_EX == Settings.getGallerySite() ?
                 R.string.gallery_list_search_bar_hint_exhentai :
                 R.string.gallery_list_search_bar_hint_e_hentai));
-        int textSize = (int) (searchBar.getEditTextTextSize() * 1.25);
-        if (searchImage != null) {
-            searchImage.setBounds(0, 0, textSize, textSize);
-            ssb.setSpan(new ImageSpan(searchImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
         searchBar.setEditTextHint(ssb);
     }
 

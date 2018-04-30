@@ -364,14 +364,9 @@ public class FavoritesScene extends BaseScene implements
 
         // Update hint
         if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-            Drawable searchImage = DrawableManager.getDrawable(context, R.drawable.v_magnify_x24);
             SpannableStringBuilder ssb = new SpannableStringBuilder("   ");
             ssb.append(getString(R.string.favorites_search_bar_hint, favCatName));
             int textSize = (int) (mSearchBar.getEditTextTextSize() * 1.25);
-            if (searchImage != null) {
-                searchImage.setBounds(0, 0, textSize, textSize);
-                ssb.setSpan(new ImageSpan(searchImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
             mSearchBar.setEditTextHint(ssb);
         }
 
