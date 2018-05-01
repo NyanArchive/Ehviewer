@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -54,6 +55,7 @@ public class EhNavigationView extends NavigationView implements DrawerLayoutChil
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void draw(@NonNull Canvas canvas) {
         super.draw(canvas);

@@ -238,8 +238,9 @@ public final class MainActivity extends StageActivity
         }
 
         String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action)) {
-            Announcer announcer = EhUrlOpener.parseUrl(intent.getData().toString());
+        Object data = intent.getData();
+        if (Intent.ACTION_VIEW.equals(action) && data != null) {
+            Announcer announcer = EhUrlOpener.parseUrl(data.toString());
             if (announcer != null) {
                 startScene(processAnnouncer(announcer));
                 return true;
@@ -251,7 +252,7 @@ public final class MainActivity extends StageActivity
                 builder.setKeyword(intent.getStringExtra(Intent.EXTRA_TEXT));
                 startScene(processAnnouncer(GalleryListScene.getStartAnnouncer(builder)));
                 return true;
-            } else if (type.startsWith("image/")) {
+            } else if (type != null && type.startsWith("image/")) {
                 Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
                 if (null != uri) {
                     UniFile file = UniFile.fromUri(this, uri);
@@ -548,25 +549,34 @@ public final class MainActivity extends StageActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.nav_homepage) {
-            Bundle args = new Bundle();
-            args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_HOMEPAGE);
-            startSceneFirstly(new Announcer(GalleryListScene.class)
-                    .setArgs(args));
-        } else if (id == R.id.nav_whats_hot) {
-            Bundle args = new Bundle();
-            args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_WHATS_HOT);
-            startSceneFirstly(new Announcer(GalleryListScene.class)
-                    .setArgs(args));
-        } else if (id == R.id.nav_favourite) {
-            startScene(new Announcer(FavoritesScene.class));
-        } else if (id == R.id.nav_history) {
-            startScene(new Announcer(HistoryScene.class));
-        } else if (id == R.id.nav_downloads) {
-            startScene(new Announcer(DownloadsScene.class));
-        } else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+        switch (id) {
+            case R.id.nav_homepage: {
+                Bundle args = new Bundle();
+                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_HOMEPAGE);
+                startSceneFirstly(new Announcer(GalleryListScene.class)
+                        .setArgs(args));
+                break;
+            }
+            case R.id.nav_whats_hot: {
+                Bundle args = new Bundle();
+                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_WHATS_HOT);
+                startSceneFirstly(new Announcer(GalleryListScene.class)
+                        .setArgs(args));
+                break;
+            }
+            case R.id.nav_favourite:
+                startScene(new Announcer(FavoritesScene.class));
+                break;
+            case R.id.nav_history:
+                startScene(new Announcer(HistoryScene.class));
+                break;
+            case R.id.nav_downloads:
+                startScene(new Announcer(DownloadsScene.class));
+                break;
+            case R.id.nav_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+                break;
         }
 
         if (id != R.id.nav_stub && mDrawerLayout != null) {

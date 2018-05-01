@@ -17,10 +17,10 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -86,7 +86,6 @@ public final class QuickSearchScene extends ToolbarScene {
     }
 
     @SuppressWarnings("deprecation")
-    @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -135,7 +134,7 @@ public final class QuickSearchScene extends ToolbarScene {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.quick_search);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -196,18 +195,19 @@ public final class QuickSearchScene extends ToolbarScene {
 
         private final LayoutInflater mInflater;
 
-        public QuickSearchAdapter() {
+        private QuickSearchAdapter() {
             mInflater = getLayoutInflater2();
             Assert.assertNotNull(mInflater);
         }
 
+        @NonNull
         @Override
-        public QuickSearchHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public QuickSearchHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new QuickSearchHolder(mInflater.inflate(R.layout.item_label_list, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(QuickSearchHolder holder, int position) {
+        public void onBindViewHolder(@NonNull QuickSearchHolder holder, int position) {
             if (mQuickSearchList != null) {
                 holder.label.setText(mQuickSearchList.get(position).name);
             }
@@ -304,21 +304,15 @@ public final class QuickSearchScene extends ToolbarScene {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.delete_quick_search_title)
                     .setMessage(getString(R.string.delete_quick_search_message, quickSearch.name))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            EhDB.deleteQuickSearch(quickSearch);
-                            quickSearchList.remove(mPosition);
-                        }
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        EhDB.deleteQuickSearch(quickSearch);
+                        quickSearchList.remove(mPosition);
                     })
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            if (null != mAdapter) {
-                                mAdapter.notifyDataSetChanged();
-                            }
-                            updateView();
+                    .setOnDismissListener(dialog -> {
+                        if (null != mAdapter) {
+                            mAdapter.notifyDataSetChanged();
                         }
+                        updateView();
                     }).show();
         }
     }

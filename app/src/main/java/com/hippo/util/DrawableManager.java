@@ -16,6 +16,7 @@
 
 package com.hippo.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -28,8 +29,10 @@ import android.support.v7.widget.AppCompatDrawableManager;
 
 public final class DrawableManager {
 
+    @SuppressLint("RestrictedApi")
     private static final AppCompatDrawableManager sManager = AppCompatDrawableManager.get();
 
+    @SuppressLint("RestrictedApi")
     public static Drawable getDrawable(@NonNull Context context, @DrawableRes int resId) {
         return sManager.getDrawable(context, resId);
     }

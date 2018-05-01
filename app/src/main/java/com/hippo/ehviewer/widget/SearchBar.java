@@ -36,7 +36,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -141,22 +140,16 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
         mSuggestionList = new ArrayList<>();
         mSuggestionAdapter = new ArrayAdapter<>(getContext(), R.layout.item_simple_list, mSuggestionList);
         list.setAdapter(mSuggestionAdapter);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
-                mEditText.setText(suggestion);
-                mEditText.setSelection(mEditText.getText().length());
-            }
+        list.setOnItemClickListener((parent, view, position, id) -> {
+            String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
+            mEditText.setText(suggestion);
+            mEditText.setSelection(mEditText.getText().length());
         });
-        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
-                mSearchDatabase.deleteQuery(suggestion);
-                updateSuggestions();
-                return true;
-            }
+        list.setOnItemLongClickListener((parent, view, position, id) -> {
+            String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
+            mSearchDatabase.deleteQuery(suggestion);
+            updateSuggestions();
+            return true;
         });
     }
 
@@ -336,7 +329,9 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
     public void showImeAndSuggestionsList(boolean animation) {
         // Show ime
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mEditText, 0);
+        if (imm != null) {
+            imm.showSoftInput(mEditText, 0);
+        }
         // update suggestion for show suggestions list
         updateSuggestions();
         // Show suggestions list
@@ -373,7 +368,9 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
     private void hideImeAndSuggestionsList(boolean animation) {
         // Hide ime
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+        }
         // Hide suggestions list
         if (animation) {
             ObjectAnimator oa = ObjectAnimator.ofFloat(this, "progress", 0f);

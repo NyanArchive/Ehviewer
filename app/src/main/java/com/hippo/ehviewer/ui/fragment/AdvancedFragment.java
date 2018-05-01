@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -72,40 +71,51 @@ public class AdvancedFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
-        if (KEY_DUMP_LOGCAT.equals(key)) {
-            boolean ok;
-            File file = null;
-            File dir = AppConfig.getExternalLogcatDir();
-            if (dir != null) {
-                file = new File(dir, "logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
-                ok = LogCat.save(file);
-            } else {
-                ok = false;
-            }
-            Resources resources = getResources();
-            Toast.makeText(getActivity(),
-                    ok ? resources.getString(R.string.settings_advanced_dump_logcat_to, file.getPath()) :
-                            resources.getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (KEY_CLEAR_MEMORY_CACHE.equals(key)) {
-            ((EhApplication) getActivity().getApplication()).clearMemoryCache();
-            Runtime.getRuntime().gc();
-        } else if (KEY_EXPORT_DATA.equals(key)) {
-            File dir = AppConfig.getExternalDataDir();
-            if (dir != null) {
-                File file = new File(dir, ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db");
-                if (EhDB.exportDB(getActivity(), file)) {
-                    Toast.makeText(getActivity(),
-                            getString(R.string.settings_advanced_export_data_to, file.getPath()), Toast.LENGTH_SHORT).show();
-                    return true;
+        switch (key) {
+            case KEY_DUMP_LOGCAT: {
+                boolean ok;
+                File file = null;
+                File dir = AppConfig.getExternalLogcatDir();
+                if (dir != null) {
+                    file = new File(dir, "logcat-" + ReadableTime.getFilenamableTime(System
+                            .currentTimeMillis()) + ".txt");
+                    ok = LogCat.save(file);
+                } else {
+                    ok = false;
                 }
+                Resources resources = getResources();
+                Toast.makeText(getActivity(),
+                        ok ? resources.getString(R.string.settings_advanced_dump_logcat_to, file
+                                .getPath()) :
+                                resources.getString(R.string
+                                        .settings_advanced_dump_logcat_failed), Toast
+                                .LENGTH_SHORT).show();
+                return true;
             }
-            Toast.makeText(getActivity(),R.string.settings_advanced_export_data_failed, Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (KEY_IMPORT_DATA.equals(key)) {
-            importData(getActivity());
-            getActivity().setResult(Activity.RESULT_OK);
-            return true;
+            case KEY_CLEAR_MEMORY_CACHE:
+                ((EhApplication) getActivity().getApplication()).clearMemoryCache();
+                Runtime.getRuntime().gc();
+                break;
+            case KEY_EXPORT_DATA: {
+                File dir = AppConfig.getExternalDataDir();
+                if (dir != null) {
+                    File file = new File(dir, ReadableTime.getFilenamableTime(System
+                            .currentTimeMillis()) + ".db");
+                    if (EhDB.exportDB(getActivity(), file)) {
+                        Toast.makeText(getActivity(),
+                                getString(R.string.settings_advanced_export_data_to, file.getPath
+                                        ()), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+                Toast.makeText(getActivity(), R.string.settings_advanced_export_data_failed,
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            case KEY_IMPORT_DATA:
+                importData(getActivity());
+                getActivity().setResult(Activity.RESULT_OK);
+                return true;
         }
         return false;
     }
@@ -122,16 +132,13 @@ public class AdvancedFragment extends PreferenceFragment
             return;
         }
         Arrays.sort(files);
-        new AlertDialog.Builder(context).setItems(files, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                File file = new File(dir, files[which]);
-                String error = EhDB.importDB(context, file);
-                if (null == error) {
-                    error = context.getString(R.string.settings_advanced_import_data_successfully);
-                }
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(context).setItems(files, (dialog, which) -> {
+            File file = new File(dir, files[which]);
+            String error = EhDB.importDB(context, file);
+            if (null == error) {
+                error = context.getString(R.string.settings_advanced_import_data_successfully);
             }
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
         }).show();
     }
 

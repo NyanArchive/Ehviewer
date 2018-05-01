@@ -36,13 +36,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -82,9 +82,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
         GalleryView.Listener {
+
+    private static final String TAG = GalleryActivity.class.getSimpleName();
 
     public static final String ACTION_DIR = "dir";
     public static final String ACTION_ZIP = "zip";
@@ -187,23 +190,29 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        if (ACTION_DIR.equals(mAction)) {
-            if (mFilename != null) {
-                mGalleryProvider = new DirGalleryProvider(UniFile.fromFile(new File(mFilename)));
-            }
-        } else if (ACTION_ZIP.equals(mAction)) {
-            if (mFilename != null) {
-                mGalleryProvider = new ZipGalleryProvider(new File(mFilename));
-            }
-        } else if (ACTION_EH.equals(mAction)) {
-            if (mGalleryInfo != null) {
-                mGalleryProvider = new EhGalleryProvider(this, mGalleryInfo);
-            }
-        } else if (Intent.ACTION_VIEW.equals(mAction)) {
-            if (mUri != null) {
-                // Only support zip now
-                mGalleryProvider = new ZipGalleryProvider(new File(mUri.getPath()));
-            }
+        switch (mAction) {
+            case ACTION_DIR:
+                if (mFilename != null) {
+                    mGalleryProvider = new DirGalleryProvider(UniFile.fromFile(new File
+                            (mFilename)));
+                }
+                break;
+            case ACTION_ZIP:
+                if (mFilename != null) {
+                    mGalleryProvider = new ZipGalleryProvider(new File(mFilename));
+                }
+                break;
+            case ACTION_EH:
+                if (mGalleryInfo != null) {
+                    mGalleryProvider = new EhGalleryProvider(this, mGalleryInfo);
+                }
+                break;
+            case Intent.ACTION_VIEW:
+                if (mUri != null) {
+                    // Only support zip now
+                    mGalleryProvider = new ZipGalleryProvider(new File(mUri.getPath()));
+                }
+                break;
         }
     }
 
@@ -339,7 +348,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
         mSize = mGalleryProvider.size();
         mCurrentIndex = startPage;
-        mLayoutMode = mGalleryView.getLayoutMode();
+        mLayoutMode = Objects.requireNonNull(mGalleryView).getLayoutMode();
         updateSlider();
 
         // Update keep screen on
@@ -502,19 +511,12 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         // Check keyboard and Dpad
-        if (keyCode == KeyEvent.KEYCODE_PAGE_UP ||
-                keyCode == KeyEvent.KEYCODE_PAGE_DOWN ||
-                keyCode == KeyEvent.KEYCODE_DPAD_LEFT ||
-                keyCode == KeyEvent.KEYCODE_DPAD_UP ||
-                keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ||
-                keyCode == KeyEvent.KEYCODE_DPAD_DOWN ||
-                keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-                keyCode == KeyEvent.KEYCODE_SPACE ||
-                keyCode == KeyEvent.KEYCODE_MENU) {
-            return true;
-        }
+        return keyCode == KeyEvent.KEYCODE_PAGE_UP || keyCode == KeyEvent.KEYCODE_PAGE_DOWN ||
+                keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_UP ||
+                keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_DOWN
+                || keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_SPACE
+                || keyCode == KeyEvent.KEYCODE_MENU || super.onKeyUp(keyCode, event);
 
-        return super.onKeyUp(keyCode, event);
     }
 
     private GalleryPageView findPageByIndex(int index) {
@@ -721,19 +723,19 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         @SuppressLint("InflateParams")
         public GalleryMenuHelper(Context context) {
             mView = LayoutInflater.from(context).inflate(R.layout.dialog_gallery_menu, null);
-            mScreenRotation = (Spinner) mView.findViewById(R.id.screen_rotation);
-            mReadingDirection = (Spinner) mView.findViewById(R.id.reading_direction);
-            mScaleMode = (Spinner) mView.findViewById(R.id.page_scaling);
-            mStartPosition = (Spinner) mView.findViewById(R.id.start_position);
-            mKeepScreenOn = (SwitchCompat) mView.findViewById(R.id.keep_screen_on);
-            mShowClock = (SwitchCompat) mView.findViewById(R.id.show_clock);
-            mShowProgress = (SwitchCompat) mView.findViewById(R.id.show_progress);
-            mShowBattery = (SwitchCompat) mView.findViewById(R.id.show_battery);
-            mShowPageInterval = (SwitchCompat) mView.findViewById(R.id.show_page_interval);
-            mVolumePage = (SwitchCompat) mView.findViewById(R.id.volume_page);
-            mReadingFullscreen = (SwitchCompat) mView.findViewById(R.id.reading_fullscreen);
-            mCustomScreenLightness = (SwitchCompat) mView.findViewById(R.id.custom_screen_lightness);
-            mScreenLightness = (SeekBar) mView.findViewById(R.id.screen_lightness);
+            mScreenRotation = mView.findViewById(R.id.screen_rotation);
+            mReadingDirection = mView.findViewById(R.id.reading_direction);
+            mScaleMode = mView.findViewById(R.id.page_scaling);
+            mStartPosition = mView.findViewById(R.id.start_position);
+            mKeepScreenOn = mView.findViewById(R.id.keep_screen_on);
+            mShowClock = mView.findViewById(R.id.show_clock);
+            mShowProgress = mView.findViewById(R.id.show_progress);
+            mShowBattery = mView.findViewById(R.id.show_battery);
+            mShowPageInterval = mView.findViewById(R.id.show_page_interval);
+            mVolumePage = mView.findViewById(R.id.volume_page);
+            mReadingFullscreen = mView.findViewById(R.id.reading_fullscreen);
+            mCustomScreenLightness = mView.findViewById(R.id.custom_screen_lightness);
+            mScreenLightness = mView.findViewById(R.id.screen_lightness);
 
             mScreenRotation.setSelection(Settings.getScreenRotation());
             mReadingDirection.setSelection(Settings.getReadingDirection());
@@ -750,12 +752,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mScreenLightness.setProgress(Settings.getScreenLightness());
             mScreenLightness.setEnabled(Settings.getCustomScreenLightness());
 
-            mCustomScreenLightness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mScreenLightness.setEnabled(isChecked);
-                }
-            });
+            mCustomScreenLightness.setOnCheckedChangeListener((buttonView, isChecked) -> mScreenLightness.setEnabled(isChecked));
         }
 
         public View getView() {
@@ -930,8 +927,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (resultData != null){
-                Uri uri = resultData.getData();
+            Uri uri;
+            if (resultData != null && (uri = resultData.getData()) != null){
+
                 String filepath = getCacheDir() + "/" + mCacheFileName;
                 File cachefile = new File(filepath);
 
@@ -950,7 +948,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     IOUtils.closeQuietly(os);
                 }
 
-                cachefile.delete();
+                if (!cachefile.delete()){
+                    Log.i(TAG, "Delete file failed: " + cachefile);
+                }
 
                 Toast.makeText(this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show();
                 // Sync media store
@@ -982,27 +982,24 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     private void pageDialogListener(AlertDialog.Builder builder, CharSequence[] items, int page){
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (mGalleryProvider == null) {
-                    return;
-                }
+        builder.setItems(items, (dialog, which) -> {
+            if (mGalleryProvider == null) {
+                return;
+            }
 
-                switch (which) {
-                    case 0: // Refresh
-                        mGalleryProvider.forceRequest(page);
-                        break;
-                    case 1: // Share
-                        shareImage(page);
-                        break;
-                    case 2: // Save
-                        saveImage(page);
-                        break;
-                    case 3: // Save to
-                        saveImageTo(page);
-                        break;
-                }
+            switch (which) {
+                case 0: // Refresh
+                    mGalleryProvider.forceRequest(page);
+                    break;
+                case 1: // Share
+                    shareImage(page);
+                    break;
+                case 2: // Save
+                    saveImage(page);
+                    break;
+                case 3: // Save to
+                    saveImageTo(page);
+                    break;
             }
         });
     }

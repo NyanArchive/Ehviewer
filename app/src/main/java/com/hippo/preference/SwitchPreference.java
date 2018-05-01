@@ -16,6 +16,7 @@
 
 package com.hippo.preference;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.TwoStatePreference;
@@ -31,6 +32,7 @@ import com.hippo.ehviewer.R;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+@SuppressLint("PrivateApi")
 public class SwitchPreference extends TwoStatePreference {
 
     private static Method sSyncSummaryViewMethod;

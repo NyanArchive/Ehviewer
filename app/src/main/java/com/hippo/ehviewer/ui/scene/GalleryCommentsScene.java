@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -169,7 +168,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(KEY_API_UID, mApiUid);
         outState.putString(KEY_API_KEY, mApiKey);
@@ -178,7 +177,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         outState.putParcelableArray(KEY_COMMENTS, mComments);
     }
 
-    @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -258,7 +256,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_comments);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -320,13 +318,14 @@ public final class GalleryCommentsScene extends ToolbarScene
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
         rv.setAdapter(new RecyclerView.Adapter<InfoHolder>() {
+            @NonNull
             @Override
-            public InfoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public InfoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 return new InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false));
             }
 
             @Override
-            public void onBindViewHolder(InfoHolder holder, int position) {
+            public void onBindViewHolder(@NonNull InfoHolder holder, int position) {
                 holder.key.setText(userArray[position]);
                 holder.value.setText(voteArray[position]);
             }
@@ -376,29 +375,28 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         new AlertDialog.Builder(context)
-                .setItems(menu.toArray(new String[menu.size()]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which < 0 || which >= menuId.size()) {
-                           return;
-                        }
-                        int id = menuId.get(which);
-                        switch (id) {
-                            case R.id.copy:
-                                ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                .setItems(menu.toArray(new String[menu.size()]), (dialog, which) -> {
+                    if (which < 0 || which >= menuId.size()) {
+                       return;
+                    }
+                    int id = menuId.get(which);
+                    switch (id) {
+                        case R.id.copy:
+                            ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (cmb != null) {
                                 cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
                                 showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
-                                break;
-                            case R.id.vote_up:
-                                voteComment(comment.id, 1);
-                                break;
-                            case R.id.vote_down:
-                                voteComment(comment.id, -1);
-                                break;
-                            case R.id.check_vote_status:
-                                showVoteStatusDialog(context, comment.voteState);
-                                break;
-                        }
+                            }
+                            break;
+                        case R.id.vote_up:
+                            voteComment(comment.id, 1);
+                            break;
+                        case R.id.vote_down:
+                            voteComment(comment.id, -1);
+                            break;
+                        case R.id.check_vote_status:
+                            showVoteStatusDialog(context, comment.voteState);
+                            break;
                     }
                 }).show();
     }
@@ -605,11 +603,11 @@ public final class GalleryCommentsScene extends ToolbarScene
         public final TextView time;
         public final LinkifyTextView comment;
 
-        public CommentHolder(View itemView) {
+        private CommentHolder(View itemView) {
             super(itemView);
-            user = (TextView) itemView.findViewById(R.id.user);
-            time = (TextView) itemView.findViewById(R.id.time);
-            comment = (LinkifyTextView) itemView.findViewById(R.id.comment);
+            user = itemView.findViewById(R.id.user);
+            time = itemView.findViewById(R.id.time);
+            comment = itemView.findViewById(R.id.comment);
         }
     }
 
@@ -617,17 +615,18 @@ public final class GalleryCommentsScene extends ToolbarScene
 
         private final LayoutInflater mInflater;
 
-        public CommentAdapter() {
+        private CommentAdapter() {
             mInflater = getLayoutInflater2();
             Assert.assertNotNull(mInflater);
         }
 
+        @NonNull
         @Override
-        public CommentHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public CommentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new CommentHolder(mInflater.inflate(R.layout.item_gallery_comment, parent, false));
         }
 
-        public CharSequence generateComment(Context context, ObservedTextView textView, GalleryComment comment) {
+        private CharSequence generateComment(Context context, ObservedTextView textView, GalleryComment comment) {
             SpannableStringBuilder ssb = Html.fromHtml(comment.comment, new URLImageGetter(textView,
                     EhApplication.getConaco(context)), null);
 
@@ -646,7 +645,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         @Override
-        public void onBindViewHolder(CommentHolder holder, int position) {
+        public void onBindViewHolder(@NonNull CommentHolder holder, int position) {
             Context context = getContext2();
             if (null == context || null == mComments) {
                 return;

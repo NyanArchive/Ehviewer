@@ -16,6 +16,7 @@
 
 package com.hippo.drawable;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -27,6 +28,7 @@ import com.hippo.yorozuya.MathUtils;
 /**
  * Show a part of the original drawable
  */
+@SuppressLint("RestrictedApi")
 public class PreciselyClipDrawable extends DrawableWrapper {
 
     private final boolean mClip;

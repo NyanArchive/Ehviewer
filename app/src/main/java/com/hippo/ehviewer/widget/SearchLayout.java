@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -134,10 +135,10 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         // Create normal view
         View normalView = mInflater.inflate(R.layout.search_normal, null);
         mNormalView = normalView;
-        mCategoryTable = (CategoryTable) normalView.findViewById(R.id.search_category_table);
-        mNormalSearchMode = (RadioGridGroup) normalView.findViewById(R.id.normal_search_mode);
-        mNormalSearchModeHelp = (ImageView) normalView.findViewById(R.id.normal_search_mode_help);
-        mEnableAdvanceSwitch = (SwitchCompat) normalView.findViewById(R.id.search_enable_advance);
+        mCategoryTable = normalView.findViewById(R.id.search_category_table);
+        mNormalSearchMode = normalView.findViewById(R.id.normal_search_mode);
+        mNormalSearchModeHelp = normalView.findViewById(R.id.normal_search_mode_help);
+        mEnableAdvanceSwitch = normalView.findViewById(R.id.search_enable_advance);
         mNormalSearchModeHelp.setOnClickListener(this);
         Ripple.addRipple(mNormalSearchModeHelp, false);
         mEnableAdvanceSwitch.setOnCheckedChangeListener(SearchLayout.this);
@@ -145,7 +146,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
 
         // Create advance view
         mAdvanceView = mInflater.inflate(R.layout.search_advance, null);
-        mTableAdvanceSearch = (AdvanceSearchTable) mAdvanceView.findViewById(R.id.search_advance_search_table);
+        mTableAdvanceSearch = mAdvanceView.findViewById(R.id.search_advance_search_table);
 
         // Create image view
         mImageView = (ImageSearchLayout) mInflater.inflate(R.layout.search_image, null);
@@ -153,7 +154,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
 
         // Create action view
         mActionView = mInflater.inflate(R.layout.search_action, null);
-        mAction = (TextView) mActionView.findViewById(R.id.action);
+        mAction = mActionView.findViewById(R.id.action);
         mAction.setOnClickListener(this);
     }
 
@@ -331,7 +332,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     }
 
     private class SimpleHolder extends RecyclerView.ViewHolder {
-        public SimpleHolder(View itemView) {
+        private SimpleHolder(View itemView) {
             super(itemView);
         }
     }
@@ -356,8 +357,9 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
             return type;
         }
 
+        @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
 
             if (viewType == ITEM_TYPE_ACTION) {
@@ -379,8 +381,8 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
                 view = mActionView;
             } else {
                 view = mInflater.inflate(R.layout.search_category, parent, false);
-                TextView title = (TextView) view.findViewById(R.id.category_title);
-                FrameLayout content = (FrameLayout) view.findViewById(R.id.category_content);
+                TextView title = view.findViewById(R.id.category_title);
+                FrameLayout content = view.findViewById(R.id.category_content);
                 switch (viewType) {
                     case ITEM_TYPE_NORMAL:
                         title.setText(R.string.search_normal);
@@ -404,7 +406,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@Nullable RecyclerView.ViewHolder holder, int position) {
             // Empty, bind view in create view
         }
     }

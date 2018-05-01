@@ -153,28 +153,22 @@ public class Slider extends View {
 
         mProgressAnimation = new ValueAnimator();
         mProgressAnimation.setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR);
-        mProgressAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                float value = (Float) animation.getAnimatedValue();
-                mDrawPercent = value;
-                mDrawProgress = Math.round(MathUtils.lerp((float) mStart, mEnd, value));
-                updateBubblePosition();
-                mBubble.setProgress(mDrawProgress);
-                invalidate();
-            }
+        mProgressAnimation.addUpdateListener(animation -> {
+            float value = (Float) animation.getAnimatedValue();
+            mDrawPercent = value;
+            mDrawProgress = Math.round(MathUtils.lerp((float) mStart, mEnd, value));
+            updateBubblePosition();
+            mBubble.setProgress(mDrawProgress);
+            invalidate();
         });
 
         mBubbleScaleAnimation = new ValueAnimator();
-        mBubbleScaleAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                float value = (Float) animation.getAnimatedValue();
-                mDrawBubbleScale = value;
-                mBubble.setScaleX(value);
-                mBubble.setScaleY(value);
-                invalidate();
-            }
+        mBubbleScaleAnimation.addUpdateListener(animation -> {
+            float value = (Float) animation.getAnimatedValue();
+            mDrawBubbleScale = value;
+            mBubble.setScaleX(value);
+            mBubble.setScaleY(value);
+            invalidate();
         });
     }
 
@@ -401,6 +395,7 @@ public class Slider extends View {
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+                performClick();
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -461,6 +456,11 @@ public class Slider extends View {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     @SuppressLint("ViewConstructor")

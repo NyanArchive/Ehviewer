@@ -20,7 +20,10 @@ package com.hippo.ehviewer.ui;
  * Created by Hippo on 2018/3/23.
  */
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +32,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AlertDialogLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
@@ -44,6 +48,9 @@ import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
 import com.hippo.ripple.Ripple;
 import com.hippo.yorozuya.LayoutUtils;
+
+import junit.framework.Assert;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -180,7 +187,10 @@ public class HostsActivity extends ToolbarActivity
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-      View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_hosts, null, false);
+      Activity activity = getActivity();
+      Assert.assertNotNull(activity);
+      LayoutInflater layoutInflater = activity.getLayoutInflater();
+      @SuppressLint("InflateParams") View view = layoutInflater.inflate(R.layout.dialog_hosts, null, false);
       host = view.findViewById(R.id.host);
       ip = view.findViewById(R.id.ip);
 
@@ -190,7 +200,7 @@ public class HostsActivity extends ToolbarActivity
         ip.setText(arguments.getString(KEY_IP));
       }
 
-      AlertDialog.Builder builder = new AlertDialog.Builder(getContext()).setView(view);
+      AlertDialog.Builder builder = new AlertDialog.Builder(activity).setView(view);
       onCreateDialogBuilder(builder);
       AlertDialog dialog = builder.create();
       dialog.setOnShowListener(d -> onCreateDialog((AlertDialog) d));
@@ -205,36 +215,46 @@ public class HostsActivity extends ToolbarActivity
     protected void put(AlertDialog dialog) {
       TextView host = dialog.findViewById(R.id.host);
       TextView ip = dialog.findViewById(R.id.ip);
-      String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
-      String ipString = ip.getText().toString().trim();
+      if (host != null && ip != null){
+        String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
+        String ipString = ip.getText().toString().trim();
 
-      if (!Hosts.isValidHost(hostString)) {
-        TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
-        hostInputLayout.setError(getContext().getString(R.string.invalid_host));
-        return;
+        Context context = getContext();
+
+        if (!Hosts.isValidHost(hostString)) {
+          TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
+          if (hostInputLayout != null && context != null) {
+            hostInputLayout.setError(context.getString(R.string.invalid_host));
+          }
+          return;
+        }
+
+        if (!Hosts.isValidIp(ipString)) {
+          TextInputLayout ipInputLayout = dialog.findViewById(R.id.ip_input_layout);
+          if (ipInputLayout != null && context != null) {
+            ipInputLayout.setError(context.getString(R.string.invalid_ip));
+          }
+          return;
+        }
+
+        HostsActivity activity = (HostsActivity) dialog.getOwnerActivity();
+        if (activity != null) {
+          activity.hosts.put(hostString, ipString);
+          activity.notifyHostsChanges();
+        }
+
+        dialog.dismiss();
       }
-
-      if (!Hosts.isValidIp(ipString)) {
-        TextInputLayout ipInputLayout = dialog.findViewById(R.id.ip_input_layout);
-        ipInputLayout.setError(getContext().getString(R.string.invalid_ip));
-        return;
-      }
-
-      HostsActivity activity = (HostsActivity) dialog.getOwnerActivity();
-      activity.hosts.put(hostString, ipString);
-      activity.notifyHostsChanges();
-
-      dialog.dismiss();
     }
 
     protected void delete(AlertDialog dialog) {
       TextView host = dialog.findViewById(R.id.host);
-      String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
-
       HostsActivity activity = (HostsActivity) dialog.getOwnerActivity();
-      activity.hosts.delete(hostString);
-      activity.notifyHostsChanges();
-
+      if (host != null && activity != null) {
+        String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
+        activity.hosts.delete(hostString);
+        activity.notifyHostsChanges();
+      }
       dialog.dismiss();
     }
   }
@@ -264,7 +284,10 @@ public class HostsActivity extends ToolbarActivity
 
     @Override
     protected void onCreateDialog(AlertDialog dialog) {
-      dialog.findViewById(R.id.host_input_layout).setEnabled(false);
+      AlertDialogLayout dialogLayout = dialog.findViewById(R.id.host_input_layout);
+      if (dialogLayout != null) {
+        dialogLayout.setEnabled(false);
+      }
       dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> put(dialog));
       dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> delete(dialog));
     }

@@ -73,6 +73,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.hippo.util.ExceptionUtils.getResponseData;
+
 public class EhEngine {
 
     private static final String TAG = EhEngine.class.getSimpleName();
@@ -145,17 +147,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return SignInParser.parse(body);
+            data = getResponseData(response);
+            return SignInParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -171,7 +173,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         GalleryListParser.Result result;
         int code = -1;
@@ -179,10 +181,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = GalleryListParser.parse(body);
+            data = getResponseData(response);
+            result = GalleryListParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -261,17 +263,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            GalleryApiParser.parse(body, galleryInfoList);
+            data = getResponseData(response);
+            GalleryApiParser.parse(data, galleryInfoList);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -287,17 +289,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return GalleryDetailParser.parse(body);
+            data = getResponseData(response);
+            return GalleryDetailParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -314,18 +316,18 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return Pair.create(GalleryDetailParser.parsePreviewSet(body),
-                    GalleryDetailParser.parsePreviewPages(body));
+            data = getResponseData(response);
+            return Pair.create(GalleryDetailParser.parsePreviewSet(data),
+                    GalleryDetailParser.parsePreviewPages(data));
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -353,17 +355,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return RateGalleryParser.parse(body);
+            data = getResponseData(response);
+            return RateGalleryParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -383,15 +385,15 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            Document document = Jsoup.parse(body);
+            data = getResponseData(response);
+            Document document = Jsoup.parse(data);
 
             Elements elements = document.select("#chd + p");
             if (elements.size() > 0) {
@@ -400,7 +402,7 @@ public class EhEngine {
 
             return GalleryDetailParser.parseComments(document);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -424,17 +426,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return GalleryTokenApiParser.parse(body);
+            data = getResponseData(response);
+            return GalleryTokenApiParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -450,7 +452,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         FavoritesParser.Result result;
         int code = -1;
@@ -458,10 +460,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = FavoritesParser.parse(body);
+            data = getResponseData(response);
+            result = FavoritesParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -508,17 +510,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            throwException(call, code, headers, body, null);
+            data = getResponseData(response);
+            throwException(call, code, headers, data, null);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -561,7 +563,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         FavoritesParser.Result result;
         int code = -1;
@@ -569,10 +571,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = FavoritesParser.parse(body);
+            data = getResponseData(response);
+            result = FavoritesParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -598,7 +600,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         Pair<String, String>[] result;
         int code = -1;
@@ -606,10 +608,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = TorrentParser.parse(body);
+            data = getResponseData(response);
+            result = TorrentParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -627,7 +629,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         Pair<String, Pair<String, String>[]> result;
         int code = -1;
@@ -635,10 +637,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = ArchiveParser.parse(body);
+            data = getResponseData(response);
+            result = ArchiveParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -667,21 +669,21 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            throwException(call, code, headers, body, null);
+            data = getResponseData(response);
+            throwException(call, code, headers, data, null);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
-        Matcher m = PATTERN_NEED_HATH_CLIENT.matcher(body);
+        Matcher m = PATTERN_NEED_HATH_CLIENT.matcher(data);
         if (m.find()) {
             throw new NoHAtHClientException("No H@H client");
         }
@@ -701,7 +703,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         List<GalleryInfo> list;
         int code = -1;
@@ -709,10 +711,10 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            list = WhatsHotParser.parse(body);
+            data = getResponseData(response);
+            list = WhatsHotParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -739,17 +741,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return ProfileParser.parse(body);
+            data = getResponseData(response);
+            return ProfileParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -766,17 +768,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return getProfileInternal(task, okHttpClient, ForumsParser.parse(body));
+            data = getResponseData(response);
+            return getProfileInternal(task, okHttpClient, ForumsParser.parse(data));
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -804,17 +806,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return VoteCommentParser.parse(body, commentVote);
+            data = getResponseData(response);
+            return VoteCommentParser.parse(data, commentVote);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }
@@ -864,7 +866,7 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         GalleryListParser.Result result;
         int code = -1;
@@ -875,10 +877,10 @@ public class EhEngine {
 
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            result = GalleryListParser.parse(body);
+            data = getResponseData(response);
+            result = GalleryListParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
 
@@ -926,17 +928,17 @@ public class EhEngine {
             task.setCall(call);
         }
 
-        String body = null;
+        String data = null;
         Headers headers = null;
         int code = -1;
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
-            return GalleryPageParser.parse(body);
+            data = getResponseData(response);
+            return GalleryPageParser.parse(data);
         } catch (Exception e) {
-            throwException(call, code, headers, body, e);
+            throwException(call, code, headers, data, e);
             throw e;
         }
     }

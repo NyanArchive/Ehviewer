@@ -16,8 +16,8 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -53,6 +53,7 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public final class CommonOperations {
 
@@ -69,11 +70,12 @@ public final class CommonOperations {
 
     private static final class UpdateTask extends AsyncTask<Void, Void, JSONObject> {
 
+        @SuppressLint("StaticFieldLeak")
         private final Activity mActivity;
         private final OkHttpClient mHttpClient;
         private final boolean mFeedback;
 
-        public UpdateTask(Activity activity, boolean feedback) {
+        private UpdateTask(Activity activity, boolean feedback) {
             mActivity = activity;
             mHttpClient = EhApplication.getOkHttpClient(activity);
             mFeedback = feedback;
@@ -91,7 +93,12 @@ public final class CommonOperations {
                 Log.d(TAG, url);
                 Request request = new Request.Builder().url(url).build();
                 Response response = mHttpClient.newCall(request).execute();
-                return new JSONObject(response.body().string());
+                ResponseBody body = response.body();
+                String data;
+                if (body != null && (data = body.string()) != null) {
+                    return new JSONObject(data);
+                }
+                return null;
             } catch (IOException e) {
                 return null;
             } catch (JSONException e) {
@@ -114,12 +121,7 @@ public final class CommonOperations {
             new AlertDialog.Builder(mActivity)
                     .setTitle(R.string.update)
                     .setMessage(mActivity.getString(R.string.update_plain, versionName, size, info))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            UrlOpener.openUrl(mActivity, url, false);
-                        }
-                    }).show();
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> UrlOpener.openUrl(mActivity, url, false)).show();
         }
 
 
@@ -193,25 +195,17 @@ public final class CommonOperations {
             String[] favCat = Settings.getFavCat();
             System.arraycopy(favCat, 0, items, 1, 10);
             new ListCheckBoxDialogBuilder(activity, items,
-                    new ListCheckBoxDialogBuilder.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(ListCheckBoxDialogBuilder builder, AlertDialog dialog, int position) {
-                            int slot = position - 1;
-                            doAddToFavorites(activity, galleryInfo, slot, listener);
-                            if (builder.isChecked()) {
-                                Settings.putDefaultFavSlot(slot);
-                            } else {
-                                Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT);
-                            }
+                    (builder, dialog, position) -> {
+                        int slot1 = position - 1;
+                        doAddToFavorites(activity, galleryInfo, slot1, listener);
+                        if (builder.isChecked()) {
+                            Settings.putDefaultFavSlot(slot1);
+                        } else {
+                            Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT);
                         }
                     }, activity.getString(R.string.remember_favorite_collection), false)
                     .setTitle(R.string.add_favorites_dialog_title)
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            listener.onCancel();
-                        }
-                    })
+                    .setOnCancelListener(dialog -> listener.onCancel())
                     .show();
         }
     }
@@ -262,34 +256,31 @@ public final class CommonOperations {
             }
 
             new ListCheckBoxDialogBuilder(activity, items,
-                    new ListCheckBoxDialogBuilder.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(ListCheckBoxDialogBuilder builder, AlertDialog dialog, int position) {
-                            String label;
-                            if (position == 0) {
-                                label = null;
-                            } else {
-                                label = items[position];
-                                if (!dm.containLabel(label)) {
-                                    label = null;
-                                }
+                    (builder, dialog, position) -> {
+                        String label1;
+                        if (position == 0) {
+                            label1 = null;
+                        } else {
+                            label1 = items[position];
+                            if (!dm.containLabel(label1)) {
+                                label1 = null;
                             }
-                            // Start download
-                            Intent intent = new Intent(activity, DownloadService.class);
-                            intent.setAction(DownloadService.ACTION_START);
-                            intent.putExtra(DownloadService.KEY_LABEL, label);
-                            intent.putExtra(DownloadService.KEY_GALLERY_INFO, galleryInfo);
-                            activity.startService(intent);
-                            // Save settings
-                            if (builder.isChecked()) {
-                                Settings.putHasDefaultDownloadLabel(true);
-                                Settings.putDefaultDownloadLabel(label);
-                            } else {
-                                Settings.putHasDefaultDownloadLabel(false);
-                            }
-                            // Notify
-                            activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
                         }
+                        // Start download
+                        Intent intent = new Intent(activity, DownloadService.class);
+                        intent.setAction(DownloadService.ACTION_START);
+                        intent.putExtra(DownloadService.KEY_LABEL, label1);
+                        intent.putExtra(DownloadService.KEY_GALLERY_INFO, galleryInfo);
+                        activity.startService(intent);
+                        // Save settings
+                        if (builder.isChecked()) {
+                            Settings.putHasDefaultDownloadLabel(true);
+                            Settings.putDefaultDownloadLabel(label1);
+                        } else {
+                            Settings.putHasDefaultDownloadLabel(false);
+                        }
+                        // Notify
+                        activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
                     }, activity.getString(R.string.remember_download_label), false)
                     .setTitle(R.string.download)
                     .show();

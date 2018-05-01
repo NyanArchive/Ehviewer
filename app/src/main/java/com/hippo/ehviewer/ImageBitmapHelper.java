@@ -35,9 +35,7 @@ public class ImageBitmapHelper implements ValueHelper<ImageBitmap> {
         try {
             isPipe.obtain();
             return ImageBitmap.decode(isPipe.open());
-        } catch (OutOfMemoryError e) {
-            return null;
-        } catch (IOException e) {
+        } catch (OutOfMemoryError | IOException e) {
             return null;
         } finally {
             isPipe.close();
@@ -62,11 +60,7 @@ public class ImageBitmapHelper implements ValueHelper<ImageBitmap> {
 
     @Override
     public boolean useMemoryCache(@NonNull String key, ImageBitmap value) {
-        if (value != null) {
-            return value.getWidth() * value.getHeight() <= MAX_CACHE_SIZE
-                    /* value.getByteCount() <= MAX_CACHE_BYTE_COUNT TODO Update Image */;
-        } else {
-            return true;
-        }
+        /* value.getByteCount() <= MAX_CACHE_BYTE_COUNT TODO Update Image */
+        return value == null || value.getWidth() * value.getHeight() <= MAX_CACHE_SIZE;
     }
 }

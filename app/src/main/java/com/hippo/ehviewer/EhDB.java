@@ -646,7 +646,9 @@ public class EhDB {
             IOUtils.closeQuietly(os);
         }
         // Delete failed file
-        file.delete();
+        if (!file.delete()) {
+            Log.i(TAG, "Delete file failed: " + file);
+        }
         return false;
     }
 

@@ -102,26 +102,18 @@ public class DownloadFragment extends PreferenceFragment implements
 
     private void showDirPickerDialogKK() {
         new AlertDialog.Builder(getActivity()).setMessage(R.string.settings_download_pick_dir_kk)
-                .setPositiveButton(R.string.settings_download_continue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        openDirPicker();
-                    }
-                }).show();
+                .setPositiveButton(R.string.settings_download_continue, (dialog, which) -> openDirPicker()).show();
     }
 
     private void showDirPickerDialogL() {
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        openDirPicker();
-                        break;
-                    case DialogInterface.BUTTON_NEUTRAL:
-                        openDirPickerL();
-                        break;
-                }
+        DialogInterface.OnClickListener listener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    openDirPicker();
+                    break;
+                case DialogInterface.BUTTON_NEUTRAL:
+                    openDirPickerL();
+                    break;
             }
         };
 
@@ -170,8 +162,10 @@ public class DownloadFragment extends PreferenceFragment implements
             case REQUEST_CODE_PICK_IMAGE_DIR_L: {
                 if (resultCode == Activity.RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Uri treeUri = data.getData();
-                    getActivity().getContentResolver().takePersistableUriPermission(
-                            treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    if (treeUri != null) {
+                        getActivity().getContentResolver().takePersistableUriPermission(
+                                treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    }
                     UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
                     if (uniFile != null) {
                         Settings.putDownloadLocation(uniFile);

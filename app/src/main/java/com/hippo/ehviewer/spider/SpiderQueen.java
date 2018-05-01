@@ -85,6 +85,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import static com.hippo.util.ExceptionUtils.getResponseData;
+
 public final class SpiderQueen implements Runnable {
 
     private static final String TAG = SpiderQueen.class.getSimpleName();
@@ -187,7 +189,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
-                0, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                0, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
                 new PriorityThreadFactory(SpiderWorker.class.getSimpleName(), Process.THREAD_PRIORITY_BACKGROUND));
     }
 
@@ -739,11 +741,10 @@ public final class SpiderQueen implements Runnable {
             Request request = new EhRequestBuilder(EhUrl.getGalleryDetailUrl(
                     mGalleryInfo.gid, mGalleryInfo.token, 0, false), config).build();
             Response response = mHttpClient.newCall(request).execute();
-            String body = response.body().string();
-
-            spiderInfo.pages = GalleryDetailParser.parsePages(body);
+            String data = getResponseData(response);
+            spiderInfo.pages = GalleryDetailParser.parsePages(data);
             spiderInfo.pTokenMap = new SparseArray<>(spiderInfo.pages);
-            readPreviews(body, 0, spiderInfo);
+            readPreviews(data, 0, spiderInfo);
             return spiderInfo;
         } catch (Exception e) {
             return null;
@@ -773,8 +774,8 @@ public final class SpiderQueen implements Runnable {
             }
             Request request = new EhRequestBuilder(url, config).build();
             Response response = mHttpClient.newCall(request).execute();
-            String body = response.body().string();
-            readPreviews(body, previewIndex, spiderInfo);
+            String data = getResponseData(response);
+            readPreviews(data, previewIndex, spiderInfo);
 
             // Save to local
             writeSpiderInfoToLocal(spiderInfo);
@@ -1356,7 +1357,7 @@ public final class SpiderQueen implements Runnable {
 
         private final int mThreadIndex;
 
-        public SpiderDecoder(int index) {
+        private SpiderDecoder(int index) {
             mThreadIndex = index;
         }
 

@@ -19,6 +19,7 @@ package com.hippo.ehviewer.ui.scene;
 import android.content.Context;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -110,12 +111,11 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_REQUEST_ID, mRequestId);
     }
 
-    @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -162,7 +162,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Show IME

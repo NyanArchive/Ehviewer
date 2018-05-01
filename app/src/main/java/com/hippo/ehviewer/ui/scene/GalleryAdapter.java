@@ -135,8 +135,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         }
     }
 
+    @NonNull
     @Override
-    public GalleryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GalleryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int layoutId;
         switch (viewType) {
             default:
@@ -159,7 +160,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     public abstract GalleryInfo getDataAt(int position);
 
     @Override
-    public void onBindViewHolder(GalleryHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GalleryHolder holder, int position) {
         GalleryInfo gi = getDataAt(position);
         if (null == gi) {
             return;
@@ -174,7 +175,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 holder.rating.setRating(gi.rating);
                 TextView category = holder.category;
                 String newCategoryText = EhUtils.getCategory(gi.category);
-                if (!newCategoryText.equals(category.getText())) {
+                if (!newCategoryText.equals(category.getText().toString())) {
                     category.setText(newCategoryText);
                     category.setBackgroundColor(EhUtils.getCategoryColor(gi.category));
                 }

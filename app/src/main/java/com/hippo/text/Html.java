@@ -101,7 +101,7 @@ public class Html {
          * a tag that it does not know how to interpret.
          */
         void handleTag(boolean opening, String tag,
-                Editable output, XMLReader xmlReader);
+                       Editable output, XMLReader xmlReader);
     }
 
     private Html() { }
@@ -137,7 +137,7 @@ public class Html {
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
      */
     public static SpannableStringBuilder fromHtml(String source, ImageGetter imageGetter,
-            TagHandler tagHandler) {
+                                                  TagHandler tagHandler) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
@@ -185,20 +185,24 @@ public class Html {
         for (int i = 0; i < text.length(); i = next) {
             next = text.nextSpanTransition(i, len, ParagraphStyle.class);
             ParagraphStyle[] style = text.getSpans(i, next, ParagraphStyle.class);
-            String elements = " ";
+            StringBuilder elements = new StringBuilder(" ");
             boolean needDiv = false;
 
-            for(int j = 0; j < style.length; j++) {
-                if (style[j] instanceof AlignmentSpan) {
+            for (ParagraphStyle aStyle : style) {
+                if (aStyle instanceof AlignmentSpan) {
                     Layout.Alignment align =
-                            ((AlignmentSpan) style[j]).getAlignment();
+                            ((AlignmentSpan) aStyle).getAlignment();
                     needDiv = true;
-                    if (align == Layout.Alignment.ALIGN_CENTER) {
-                        elements = "align=\"center\" " + elements;
-                    } else if (align == Layout.Alignment.ALIGN_OPPOSITE) {
-                        elements = "align=\"right\" " + elements;
-                    } else {
-                        elements = "align=\"left\" " + elements;
+                    switch (align) {
+                        case ALIGN_CENTER:
+                            elements.insert(0, "align=\"center\" ");
+                            break;
+                        case ALIGN_OPPOSITE:
+                            elements.insert(0, "align=\"right\" ");
+                            break;
+                        default:
+                            elements.insert(0, "align=\"left\" ");
+                            break;
                     }
                 }
             }
@@ -215,7 +219,7 @@ public class Html {
     }
 
     private static void withinDiv(StringBuilder out, Spanned text,
-            int start, int end) {
+                                  int start, int end) {
         int next;
         for (int i = start; i < end; i = next) {
             next = text.nextSpanTransition(i, end, QuoteSpan.class);
@@ -252,7 +256,7 @@ public class Html {
     }
 
     private static void withinBlockquote(StringBuilder out, Spanned text,
-            int start, int end) {
+                                         int start, int end) {
         out.append(getOpenParaTagWithDirection(text, start, end));
 
         int next;
@@ -281,17 +285,17 @@ public class Html {
 
     /* Returns true if the caller should close and reopen the paragraph. */
     private static boolean withinParagraph(StringBuilder out, Spanned text,
-            int start, int end, int nl,
-            boolean last) {
+                                           int start, int end, int nl,
+                                           boolean last) {
         int next;
         for (int i = start; i < end; i = next) {
             next = text.nextSpanTransition(i, end, CharacterStyle.class);
             CharacterStyle[] style = text.getSpans(i, next,
                     CharacterStyle.class);
 
-            for (int j = 0; j < style.length; j++) {
-                if (style[j] instanceof StyleSpan) {
-                    int s = ((StyleSpan) style[j]).getStyle();
+            for (CharacterStyle aStyle : style) {
+                if (aStyle instanceof StyleSpan) {
+                    int s = ((StyleSpan) aStyle).getStyle();
 
                     if ((s & Typeface.BOLD) != 0) {
                         out.append("<b>");
@@ -300,49 +304,50 @@ public class Html {
                         out.append("<i>");
                     }
                 }
-                if (style[j] instanceof TypefaceSpan) {
-                    String s = ((TypefaceSpan) style[j]).getFamily();
+                if (aStyle instanceof TypefaceSpan) {
+                    String s = ((TypefaceSpan) aStyle).getFamily();
 
                     if ("monospace".equals(s)) {
                         out.append("<tt>");
                     }
                 }
-                if (style[j] instanceof SuperscriptSpan) {
+                if (aStyle instanceof SuperscriptSpan) {
                     out.append("<sup>");
                 }
-                if (style[j] instanceof SubscriptSpan) {
+                if (aStyle instanceof SubscriptSpan) {
                     out.append("<sub>");
                 }
-                if (style[j] instanceof UnderlineSpan) {
+                if (aStyle instanceof UnderlineSpan) {
                     out.append("<u>");
                 }
-                if (style[j] instanceof StrikethroughSpan) {
+                if (aStyle instanceof StrikethroughSpan) {
                     out.append("<strike>");
                 }
-                if (style[j] instanceof URLSpan) {
+                if (aStyle instanceof URLSpan) {
                     out.append("<a href=\"");
-                    out.append(((URLSpan) style[j]).getURL());
+                    out.append(((URLSpan) aStyle).getURL());
                     out.append("\">");
                 }
-                if (style[j] instanceof ImageSpan) {
+                if (aStyle instanceof ImageSpan) {
                     out.append("<img src=\"");
-                    out.append(((ImageSpan) style[j]).getSource());
+                    out.append(((ImageSpan) aStyle).getSource());
                     out.append("\">");
 
                     // Don't output the dummy character underlying the image.
                     i = next;
                 }
-                if (style[j] instanceof AbsoluteSizeSpan) {
+                if (aStyle instanceof AbsoluteSizeSpan) {
                     out.append("<font size =\"");
-                    out.append(((AbsoluteSizeSpan) style[j]).getSize() / 6);
+                    out.append(((AbsoluteSizeSpan) aStyle).getSize() / 6);
                     out.append("\">");
                 }
-                if (style[j] instanceof ForegroundColorSpan) {
+                if (aStyle instanceof ForegroundColorSpan) {
                     out.append("<font color =\"#");
-                    String color = Integer.toHexString(((ForegroundColorSpan)
-                            style[j]).getForegroundColor() + 0x01000000);
+                    StringBuilder color = new StringBuilder(Integer.toHexString((
+                            (ForegroundColorSpan)
+                                    aStyle).getForegroundColor() + 0x01000000));
                     while (color.length() < 6) {
-                        color = "0" + color;
+                        color.insert(0, "0");
                     }
                     out.append(color);
                     out.append("\">");
@@ -405,7 +410,7 @@ public class Html {
     }
 
     private static void withinStyle(StringBuilder out, CharSequence text,
-            int start, int end) {
+                                    int start, int end) {
         for (int i = start; i < end; i++) {
             char c = text.charAt(i);
 
@@ -477,9 +482,10 @@ class HtmlToSpannedConverter implements ContentHandler {
 
         // Fix flags and range for paragraph-type markup.
         Object[] obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
-        for (int i = 0; i < obj.length; i++) {
-            int start = mSpannableStringBuilder.getSpanStart(obj[i]);
-            int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
+
+        for (Object anObj : obj) {
+            int start = mSpannableStringBuilder.getSpanStart(anObj);
+            int end = mSpannableStringBuilder.getSpanEnd(anObj);
 
             // If the last line of the range is blank, back off by one.
             if (end - 2 >= 0) {
@@ -490,9 +496,9 @@ class HtmlToSpannedConverter implements ContentHandler {
             }
 
             if (end == start) {
-                mSpannableStringBuilder.removeSpan(obj[i]);
+                mSpannableStringBuilder.removeSpan(anObj);
             } else {
-                mSpannableStringBuilder.setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
+                mSpannableStringBuilder.setSpan(anObj, start, end, Spannable.SPAN_PARAGRAPH);
             }
         }
 
@@ -636,7 +642,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         text.append("\n");
     }
 
-    private static Object getLast(Spanned text, Class kind) {
+    private static Object getLast(Spanned text, Class<?> kind) {
         /*
          * This knows that the last returned object from getSpans()
          * will be the most recently added.
@@ -656,7 +662,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     }
 
     private static void end(SpannableStringBuilder text, Class kind,
-            Object repl) {
+                            Object repl) {
         int len = text.length();
         Object obj = getLast(text, kind);
         int where = text.getSpanStart(obj);
@@ -669,7 +675,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     }
 
     private static void startImg(SpannableStringBuilder text,
-            Attributes attributes, Html.ImageGetter img) {
+                                 Attributes attributes, Html.ImageGetter img) {
         String src = attributes.getValue("", "src");
         Drawable d = null;
 
@@ -690,7 +696,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     }
 
     private static void startFont(SpannableStringBuilder text,
-            Attributes attributes) {
+                                  Attributes attributes) {
         String color = attributes.getValue("", "color");
         String face = attributes.getValue("", "face");
 
@@ -708,6 +714,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         if (where != len) {
             Font f = (Font) obj;
 
+            assert f != null;
             if (!TextUtils.isEmpty(f.mColor)) {
                 if (f.mColor.startsWith("@")) {
                     Resources res = Resources.getSystem();
@@ -750,6 +757,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         if (where != len) {
             Href h = (Href) obj;
 
+            assert h != null;
             if (h.mHref != null) {
                 text.setSpan(new URLSpan(h.mHref), where, len,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -773,6 +781,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         if (where != len) {
             Header h = (Header) obj;
 
+            assert h != null;
             text.setSpan(new RelativeSizeSpan(HEADER_SIZES[h.mLevel]),
                     where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             text.setSpan(new StyleSpan(Typeface.BOLD),

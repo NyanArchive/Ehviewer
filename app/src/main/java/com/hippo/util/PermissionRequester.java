@@ -17,7 +17,6 @@
 package com.hippo.util;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -41,14 +40,9 @@ public class PermissionRequester {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
             new AlertDialog.Builder(activity)
                     .setMessage(rationale)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(activity,
-                                    new String[]{permission},
-                                    requestCode);
-                        }
-                    }).setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> ActivityCompat.requestPermissions(activity,
+                            new String[]{permission},
+                            requestCode)).setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else {
             ActivityCompat.requestPermissions(activity,

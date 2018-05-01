@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -44,6 +45,7 @@ import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FilterActivity extends ToolbarActivity {
 
@@ -165,18 +167,15 @@ public class FilterActivity extends ToolbarActivity {
 
         new AlertDialog.Builder(this)
                 .setMessage(message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (DialogInterface.BUTTON_POSITIVE != which || null == mFilterList) {
-                            return;
-                        }
-                        mFilterList.delete(filter);
-                        if (null != mAdapter) {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                        updateView(true);
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    if (DialogInterface.BUTTON_POSITIVE != which || null == mFilterList) {
+                        return;
                     }
+                    mFilterList.delete(filter);
+                    if (null != mAdapter) {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                    updateView(true);
                 }).show();
     }
 
@@ -244,7 +243,7 @@ public class FilterActivity extends ToolbarActivity {
         public FilterHolder(View itemView) {
             super(itemView);
             text = (TextView) ViewUtils.$$(itemView, R.id.text);
-            icon = (ImageView) itemView.findViewById(R.id.icon);
+            icon = itemView.findViewById(R.id.icon);
 
             if (null != icon) {
                 icon.setOnClickListener(this);
@@ -267,7 +266,7 @@ public class FilterActivity extends ToolbarActivity {
                     mFilterList.trigger(filter);
 
                     //for updating delete line on filter text
-                    mAdapter.notifyItemChanged(getAdapterPosition());
+                    Objects.requireNonNull(mAdapter).notifyItemChanged(getAdapterPosition());
                 }
 
             }
@@ -292,8 +291,9 @@ public class FilterActivity extends ToolbarActivity {
             }
         }
 
+        @NonNull
         @Override
-        public FilterHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public FilterHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             int layoutId;
             switch (viewType) {
                 default:
@@ -316,7 +316,7 @@ public class FilterActivity extends ToolbarActivity {
         }
 
         @Override
-        public void onBindViewHolder(FilterHolder holder, int position) {
+        public void onBindViewHolder(@NonNull FilterHolder holder, int position) {
             if (null == mFilterList) {
                 return;
             }
@@ -356,7 +356,7 @@ public class FilterActivity extends ToolbarActivity {
         private Filter mTagHeader;
         private Filter mTagNamespaceHeader;
 
-        public FilterList() {
+        private FilterList() {
             mEhFilter = EhFilter.getInstance();
             mTitleFilterList = mEhFilter.getTitleFilterList();
             mUploaderFilterList = mEhFilter.getUploaderFilterList();
@@ -453,8 +453,6 @@ public class FilterActivity extends ToolbarActivity {
                     return getTagNamespaceHeader();
                 } else if (index <= size) {
                     return mTagNamespaceFilterList.get(index - 1);
-                } else {
-                    index -= size + 1;
                 }
             }
 

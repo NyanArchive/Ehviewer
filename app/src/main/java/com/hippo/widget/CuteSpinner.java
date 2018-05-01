@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.AppCompatSpinner;
@@ -57,10 +58,11 @@ public class CuteSpinner extends AppCompatSpinner {
         init(context, attrs, defStyleAttr);
     }
 
+    @SuppressLint("RestrictedApi")
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, attrs,
                 android.support.v7.appcompat.R.styleable.Spinner, defStyleAttr, 0);
-        final CharSequence[] entries = a.getTextArray(R.styleable.Spinner_android_entries);
+        @SuppressLint("PrivateResource") final CharSequence[] entries = a.getTextArray(R.styleable.Spinner_android_entries);
         if (entries != null) {
             final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(context,
                     R.layout.item_cute_spinner_item, entries);

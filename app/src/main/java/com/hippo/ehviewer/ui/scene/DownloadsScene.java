@@ -45,7 +45,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -268,7 +267,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(KEY_LABEL, mLabel);
     }
@@ -287,7 +286,7 @@ public class DownloadsScene extends ToolbarScene
         mViewTransition = new ViewTransition(content, tip);
 
         Context context = getContext2();
-        Assert.assertNotNull(content);
+        Assert.assertNotNull(context);
         Resources resources = context.getResources();
 
         Drawable drawable = DrawableManager.getDrawable(context, R.drawable.big_download);
@@ -428,7 +427,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateTitle();
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -511,53 +510,47 @@ public class DownloadsScene extends ToolbarScene
         final Context context = getContext2();
         Assert.assertNotNull(context);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.download_labels);
         toolbar.inflateMenu(R.menu.drawer_download);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_settings:
-                        startScene(new Announcer(DownloadLabelsScene.class));
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_settings:
+                    startScene(new Announcer(DownloadLabelsScene.class));
+                    return true;
+                case R.id.action_default_download_label:
+                    DownloadManager dm = mDownloadManager;
+                    if (null == dm) {
                         return true;
-                    case R.id.action_default_download_label:
-                        DownloadManager dm = mDownloadManager;
-                        if (null == dm) {
-                            return true;
-                        }
+                    }
 
-                        List<DownloadLabel> list = dm.getLabelList();
-                        final String[] items = new String[list.size() + 2];
-                        items[0] = getString(R.string.let_me_select);
-                        items[1] = getString(R.string.default_download_label_name);
-                        for (int i = 0, n = list.size(); i < n; i++) {
-                            items[i + 2] = list.get(i).getLabel();
-                        }
-                        new AlertDialog.Builder(context)
-                                .setTitle(R.string.default_download_label)
-                                .setItems(items, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (which == 0) {
-                                            Settings.putHasDefaultDownloadLabel(false);
-                                        } else {
-                                            Settings.putHasDefaultDownloadLabel(true);
-                                            String label;
-                                            if (which == 1) {
-                                                label = null;
-                                            } else {
-                                                label = items[which];
-                                            }
-                                            Settings.putDefaultDownloadLabel(label);
-                                        }
+                    List<DownloadLabel> list = dm.getLabelList();
+                    final String[] items = new String[list.size() + 2];
+                    items[0] = getString(R.string.let_me_select);
+                    items[1] = getString(R.string.default_download_label_name);
+                    for (int i = 0, n = list.size(); i < n; i++) {
+                        items[i + 2] = list.get(i).getLabel();
+                    }
+                    new AlertDialog.Builder(context)
+                            .setTitle(R.string.default_download_label)
+                            .setItems(items, (dialog, which) -> {
+                                if (which == 0) {
+                                    Settings.putHasDefaultDownloadLabel(false);
+                                } else {
+                                    Settings.putHasDefaultDownloadLabel(true);
+                                    String label;
+                                    if (which == 1) {
+                                        label = null;
+                                    } else {
+                                        label = items[which];
                                     }
-                                }).show();
-                        return true;
-                }
-                return false;
+                                    Settings.putDefaultDownloadLabel(label);
+                                }
+                            }).show();
+                    return true;
             }
+            return false;
         });
 
         List<DownloadLabel> list = EhApplication.getDownloadManager(context).getLabelList();
@@ -569,23 +562,20 @@ public class DownloadsScene extends ToolbarScene
         }
 
         // TODO handle download label items update
-        ListView listView = (ListView) view.findViewById(R.id.list_view);
+        ListView listView = view.findViewById(R.id.list_view);
         listView.setAdapter(new ArrayAdapter<>(context, R.layout.item_simple_list, labels));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String label;
-                if (position == 0) {
-                    label = null;
-                } else {
-                    label = labels.get(position);
-                }
-                if (!ObjectUtils.equal(label, mLabel)) {
-                    mLabel = label;
-                    updateForLabel();
-                    updateView();
-                    closeDrawer(Gravity.RIGHT);
-                }
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            String label;
+            if (position == 0) {
+                label = null;
+            } else {
+                label = labels.get(position);
+            }
+            if (!ObjectUtils.equal(label, mLabel)) {
+                mLabel = label;
+                updateForLabel();
+                updateView();
+                closeDrawer(Gravity.RIGHT);
             }
         });
 
@@ -729,7 +719,7 @@ public class DownloadsScene extends ToolbarScene
                     break;
                 }
                 case 3: { // Delete
-                    CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
+                    @SuppressLint("StringFormatMatches") CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
                             getString(R.string.download_remove_dialog_message_2, gidList.size()),
                             getString(R.string.download_remove_dialog_check_text),
                             Settings.getRemoveImageFiles());
@@ -1058,17 +1048,17 @@ public class DownloadsScene extends ToolbarScene
         public DownloadHolder(View itemView) {
             super(itemView);
 
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
             start = itemView.findViewById(R.id.start);
             stop = itemView.findViewById(R.id.stop);
-            state = (TextView) itemView.findViewById(R.id.state);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-            percent = (TextView) itemView.findViewById(R.id.percent);
-            speed = (TextView) itemView.findViewById(R.id.speed);
+            state = itemView.findViewById(R.id.state);
+            progressBar = itemView.findViewById(R.id.progress_bar);
+            percent = itemView.findViewById(R.id.percent);
+            speed = itemView.findViewById(R.id.speed);
 
             // TODO cancel on click listener when select items
             thumb.setOnClickListener(this);
@@ -1135,13 +1125,14 @@ public class DownloadsScene extends ToolbarScene
             return mList.get(position).gid;
         }
 
+        @NonNull
         @Override
-        public DownloadHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public DownloadHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new DownloadHolder(mInflater.inflate(R.layout.item_download, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(DownloadHolder holder, int position) {
+        public void onBindViewHolder(@NonNull DownloadHolder holder, int position) {
             if (mList == null) {
                 return;
             }
@@ -1153,7 +1144,7 @@ public class DownloadsScene extends ToolbarScene
             holder.rating.setRating(info.rating);
             TextView category = holder.category;
             String newCategoryText = EhUtils.getCategory(info.category);
-            if (!newCategoryText.equals(category.getText())) {
+            if (!newCategoryText.equals(category.getText().toString())) {
                 category.setText(newCategoryText);
                 category.setBackgroundColor(EhUtils.getCategoryColor(info.category));
             }

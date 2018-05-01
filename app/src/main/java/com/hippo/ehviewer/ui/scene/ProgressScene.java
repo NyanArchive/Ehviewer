@@ -118,10 +118,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
             mGid = args.getLong(KEY_GID, -1);
             mPToken = args.getString(KEY_PTOKEN, null);
             mPage = args.getInt(KEY_PAGE, -1);
-            if (mGid == -1 || mPToken == null || mPage == -1) {
-                return false;
-            }
-            return true;
+            return mGid != -1 && mPToken != null && mPage != -1;
         }
 
         return false;
@@ -149,7 +146,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_VALID, mValid);
         outState.putString(KEY_ERROR, mError);
@@ -161,7 +158,6 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         outState.putInt(KEY_PAGE, mPage);
     }
 
-    @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

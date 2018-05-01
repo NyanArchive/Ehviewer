@@ -41,11 +41,9 @@ import android.text.style.ImageSpan;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -227,15 +225,22 @@ public final class GalleryListScene extends BaseScene
         }
 
         String action = args.getString(KEY_ACTION);
-        if (ACTION_HOMEPAGE.equals(action)) {
-            mUrlBuilder.reset();
-        } else if (ACTION_WHATS_HOT.equals(action)) {
-            mUrlBuilder.setMode(ListUrlBuilder.MODE_WHATS_HOT);
-        } else if (ACTION_LIST_URL_BUILDER.equals(action)) {
-            ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
-            if (builder != null) {
-                mUrlBuilder.set(builder);
-            }
+        if (action == null) {
+            return;
+        }
+        switch (action) {
+            case ACTION_HOMEPAGE:
+                mUrlBuilder.reset();
+                break;
+            case ACTION_WHATS_HOT:
+                mUrlBuilder.setMode(ListUrlBuilder.MODE_WHATS_HOT);
+                break;
+            case ACTION_LIST_URL_BUILDER:
+                ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
+                if (builder != null) {
+                    mUrlBuilder.set(builder);
+                }
+                break;
         }
     }
 
@@ -280,15 +285,11 @@ public final class GalleryListScene extends BaseScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
-        if (mHelper != null && 1 == mHelper.getShownViewIndex()) {
-            hasFirstRefresh = false;
-        } else {
-            hasFirstRefresh = mHasFirstRefresh;
-        }
+        hasFirstRefresh = (mHelper == null || 1 != mHelper.getShownViewIndex()) && mHasFirstRefresh;
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
         outState.putParcelable(KEY_LIST_URL_BUILDER, mUrlBuilder);
         outState.putInt(KEY_STATE, mState);
@@ -379,7 +380,6 @@ public final class GalleryListScene extends BaseScene
         mNavCheckedId = checkedItemId;
     }
 
-    @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -547,14 +547,11 @@ public final class GalleryListScene extends BaseScene
         final CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(
                 context, getString(R.string.add_quick_search_tip), getString(R.string.get_it), false);
         builder.setTitle(R.string.readme);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (builder.isChecked()) {
-                    Settings.putQuickSearchTip(false);
-                }
-                showAddQuickSearchDialog(list, adapter, listView, tip);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            if (builder.isChecked()) {
+                Settings.putQuickSearchTip(false);
             }
+            showAddQuickSearchDialog(list, adapter, listView, tip);
         }).show();
     }
 
@@ -585,40 +582,37 @@ public final class GalleryListScene extends BaseScene
         builder.setTitle(R.string.add_quick_search_dialog_title);
         builder.setPositiveButton(android.R.string.ok, null);
         final AlertDialog dialog = builder.show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = builder.getText().trim();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String text = builder.getText().trim();
 
-                // Check name empty
-                if (TextUtils.isEmpty(text)) {
-                    builder.setError(getString(R.string.name_is_empty));
+            // Check name empty
+            if (TextUtils.isEmpty(text)) {
+                builder.setError(getString(R.string.name_is_empty));
+                return;
+            }
+
+            // Check name duplicate
+            for (QuickSearch q: list) {
+                if (text.equals(q.name)) {
+                    builder.setError(getString(R.string.duplicate_name));
                     return;
                 }
+            }
 
-                // Check name duplicate
-                for (QuickSearch q: list) {
-                    if (text.equals(q.name)) {
-                        builder.setError(getString(R.string.duplicate_name));
-                        return;
-                    }
-                }
+            builder.setError(null);
+            dialog.dismiss();
+            QuickSearch quickSearch = urlBuilder.toQuickSearch();
+            quickSearch.name = text;
+            EhDB.insertQuickSearch(quickSearch);
+            list.add(quickSearch);
+            adapter.notifyDataSetChanged();
 
-                builder.setError(null);
-                dialog.dismiss();
-                QuickSearch quickSearch = urlBuilder.toQuickSearch();
-                quickSearch.name = text;
-                EhDB.insertQuickSearch(quickSearch);
-                list.add(quickSearch);
-                adapter.notifyDataSetChanged();
-
-                if (0 == list.size()) {
-                    tip.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.GONE);
-                } else {
-                    tip.setVisibility(View.GONE);
-                    listView.setVisibility(View.VISIBLE);
-                }
+            if (0 == list.size()) {
+                tip.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.GONE);
+            } else {
+                tip.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -637,43 +631,37 @@ public final class GalleryListScene extends BaseScene
         final List<QuickSearch> list = EhDB.getAllQuickSearch();
         final ArrayAdapter<QuickSearch> adapter = new ArrayAdapter<>(context, R.layout.item_simple_list, list);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (null == mHelper || null == mUrlBuilder) {
-                    return;
-                }
-
-                mUrlBuilder.set(list.get(position));
-                mUrlBuilder.setPageIndex(0);
-                onUpdateUrlBuilder();
-                mHelper.refresh();
-                setState(STATE_NORMAL);
-                closeDrawer(Gravity.RIGHT);
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            if (null == mHelper || null == mUrlBuilder) {
+                return;
             }
+
+            mUrlBuilder.set(list.get(position));
+            mUrlBuilder.setPageIndex(0);
+            onUpdateUrlBuilder();
+            mHelper.refresh();
+            setState(STATE_NORMAL);
+            closeDrawer(Gravity.RIGHT);
         });
 
         tip.setText(R.string.quick_search_tip);
         toolbar.setTitle(R.string.quick_search);
         toolbar.inflateMenu(R.menu.drawer_gallery_list);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_add:
-                        if (Settings.getQuickSearchTip()) {
-                            showQuickSearchTipDialog(list, adapter, listView, tip);
-                        } else {
-                            showAddQuickSearchDialog(list, adapter, listView, tip);
-                        }
-                        break;
-                    case R.id.action_settings:
-                        startScene(new Announcer(QuickSearchScene.class));
-                        break;
-                }
-                return true;
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_add:
+                    if (Settings.getQuickSearchTip()) {
+                        showQuickSearchTipDialog(list, adapter, listView, tip);
+                    } else {
+                        showAddQuickSearchDialog(list, adapter, listView, tip);
+                    }
+                    break;
+                case R.id.action_settings:
+                    startScene(new Announcer(QuickSearchScene.class));
+                    break;
             }
+            return true;
         });
 
         if (0 == list.size()) {
@@ -786,31 +774,28 @@ public final class GalleryListScene extends BaseScene
         final AlertDialog dialog = builder.setTitle(R.string.go_to)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null == mHelper) {
-                    dialog.dismiss();
-                    return;
-                }
-
-                String text = builder.getText().trim();
-                int goTo;
-                try {
-                    goTo = Integer.parseInt(text) - 1;
-                } catch (NumberFormatException e){
-                    builder.setError(getString(R.string.error_invalid_number));
-                    return;
-                }
-                if (goTo < 0 || goTo >= pages) {
-                    builder.setError(getString(R.string.error_out_of_range));
-                    return;
-                }
-                builder.setError(null);
-                mHelper.goTo(goTo);
-                AppHelper.hideSoftInput(dialog);
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (null == mHelper) {
                 dialog.dismiss();
+                return;
             }
+
+            String text = builder.getText().trim();
+            int goTo;
+            try {
+                goTo = Integer.parseInt(text) - 1;
+            } catch (NumberFormatException e){
+                builder.setError(getString(R.string.error_invalid_number));
+                return;
+            }
+            if (goTo < 0 || goTo >= pages) {
+                builder.setError(getString(R.string.error_out_of_range));
+                return;
+            }
+            builder.setError(null);
+            mHelper.goTo(goTo);
+            AppHelper.hideSoftInput(dialog);
+            dialog.dismiss();
         });
     }
 
@@ -862,19 +847,16 @@ public final class GalleryListScene extends BaseScene
         final GalleryInfo gi = mHelper.getDataAt(position);
         new AlertDialog.Builder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
-                .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Download
-                                CommonOperations.startDownload(activity, gi, false);
-                                break;
-                            case 1: // Favorites
-                                CommonOperations.addToFavorites(activity, gi,
-                                        new addToFavoriteListener(context,
-                                                activity.getStageId(), getTag()));
-                                break;
-                        }
+                .setItems(R.array.gallery_list_menu_entries, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Download
+                            CommonOperations.startDownload(activity, gi, false);
+                            break;
+                        case 1: // Favorites
+                            CommonOperations.addToFavorites(activity, gi,
+                                    new addToFavoriteListener(context,
+                                            activity.getStageId(), getTag()));
+                            break;
                     }
                 }).show();
         return true;

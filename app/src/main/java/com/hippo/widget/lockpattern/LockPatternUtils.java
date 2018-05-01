@@ -33,8 +33,7 @@ public class LockPatternUtils {
         List<LockPatternView.Cell> result = new ArrayList<>();
 
         final byte[] bytes = string.getBytes();
-        for (int i = 0; i < bytes.length; i++) {
-            byte b = bytes[i];
+        for (byte b : bytes) {
             result.add(LockPatternView.Cell.of(b / 3, b % 3));
         }
         return result;

@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.client.data;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
@@ -215,27 +216,13 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     }
 
     public boolean equalsQuickSearch(QuickSearch q) {
-        if (null == q) {
-            return false;
-        }
+        return q != null
+                && q.mode == mMode
+                && q.category == mCategory
+                && StringUtils.equals(q.keyword, mKeyword)
+                && q.advanceSearch == mAdvanceSearch
+                && q.minRating == mMinRating;
 
-        if (q.mode != mMode) {
-            return false;
-        }
-        if (q.category != mCategory) {
-            return false;
-        }
-        if (!StringUtils.equals(q.keyword, mKeyword)) {
-            return false;
-        }
-        if (q.advanceSearch != mAdvanceSearch) {
-            return false;
-        }
-        if (q.minRating != mMinRating) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -257,110 +244,133 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         int advanceSearch = 0;
         boolean enableMinRating = false;
         int minRating = 0;
-        for (int i = 0, size = querys.length; i < size; i++) {
-            String str = querys[i];
+        for (String str : querys) {
             int index = str.indexOf('=');
             if (index < 0) {
                 continue;
             }
             String key = str.substring(0, index);
             String value = str.substring(index + 1);
-            if ("f_doujinshi".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.DOUJINSHI;
-                }
-            } else if ("f_manga".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.MANGA;
-                }
-            } else if ("f_artistcg".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.ARTIST_CG;
-                }
-            } else if ("f_gamecg".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.GAME_CG;
-                }
-            } else if ("f_western".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.WESTERN;
-                }
-            } else if ("f_non-h".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.NON_H;
-                }
-            } else if ("f_imageset".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.IMAGE_SET;
-                }
-            } else if ("f_cosplay".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.COSPLAY;
-                }
-            } else if ("f_asianporn".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.ASIAN_PORN;
-                }
-            } else if ("f_misc".equals(key)) {
-                if ("1".equals(value)) {
-                    category |= EhConfig.MISC;
-                }
-            } else if ("f_search".equals(key)) {
-                try {
-                    keyword = URLDecoder.decode(value, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Ignore
-                }
-            } else if ("advsearch".equals(key)) {
-                if ("1".equals(value)) {
-                    enableAdvanceSearch = true;
-                }
-            } else if ("f_sname".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.SNAME;
-                }
-            } else if ("f_stags".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.STAGS;
-                }
-            } else if ("f_sdesc".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.SDESC;
-                }
-            } else if ("f_storr".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.STORR;
-                }
-            } else if ("f_sto".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.STO;
-                }
-            } else if ("f_sdt1".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.SDT1;
-                }
-            } else if ("f_sdt2".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.SDT2;
-                }
-            } else if ("f_sh".equals(key)) {
-                if ("on".equals(value)) {
-                    advanceSearch |= AdvanceSearchTable.SH;
-                }
-            } else if ("f_sr".equals(key)) {
-                if ("on".equals(value)) {
-                    enableMinRating = true;
-                }
-            } else if ("f_srdd".equals(key)) {
-                try {
-                    minRating = Integer.parseInt(value);
-                } catch (NumberFormatException e) {
-                    // Ignore
-                }
-            } else if ("f_apply".equals(key)) {
-                if ("Apply+Filter".equals(value)) {
-                    apply = true;
-                }
+            switch (key) {
+                case "f_doujinshi":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.DOUJINSHI;
+                    }
+                    break;
+                case "f_manga":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.MANGA;
+                    }
+                    break;
+                case "f_artistcg":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.ARTIST_CG;
+                    }
+                    break;
+                case "f_gamecg":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.GAME_CG;
+                    }
+                    break;
+                case "f_western":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.WESTERN;
+                    }
+                    break;
+                case "f_non-h":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.NON_H;
+                    }
+                    break;
+                case "f_imageset":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.IMAGE_SET;
+                    }
+                    break;
+                case "f_cosplay":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.COSPLAY;
+                    }
+                    break;
+                case "f_asianporn":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.ASIAN_PORN;
+                    }
+                    break;
+                case "f_misc":
+                    if ("1".equals(value)) {
+                        category |= EhConfig.MISC;
+                    }
+                    break;
+                case "f_search":
+                    try {
+                        keyword = URLDecoder.decode(value, "utf-8");
+                    } catch (UnsupportedEncodingException e) {
+                        // Ignore
+                    }
+                    break;
+                case "advsearch":
+                    if ("1".equals(value)) {
+                        enableAdvanceSearch = true;
+                    }
+                    break;
+                case "f_sname":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.SNAME;
+                    }
+                    break;
+                case "f_stags":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.STAGS;
+                    }
+                    break;
+                case "f_sdesc":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.SDESC;
+                    }
+                    break;
+                case "f_storr":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.STORR;
+                    }
+                    break;
+                case "f_sto":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.STO;
+                    }
+                    break;
+                case "f_sdt1":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.SDT1;
+                    }
+                    break;
+                case "f_sdt2":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.SDT2;
+                    }
+                    break;
+                case "f_sh":
+                    if ("on".equals(value)) {
+                        advanceSearch |= AdvanceSearchTable.SH;
+                    }
+                    break;
+                case "f_sr":
+                    if ("on".equals(value)) {
+                        enableMinRating = true;
+                    }
+                    break;
+                case "f_srdd":
+                    try {
+                        minRating = Integer.parseInt(value);
+                    } catch (NumberFormatException e) {
+                        // Ignore
+                    }
+                    break;
+                case "f_apply":
+                    if ("Apply+Filter".equals(value)) {
+                        apply = true;
+                    }
+                    break;
             }
         }
 
@@ -382,6 +392,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         }
     }
 
+    @SuppressLint("SwitchIntDef")
     public String build() {
         switch (mMode) {
             default:
@@ -492,7 +503,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     }
 
     @SuppressWarnings("WrongConstant")
-    protected ListUrlBuilder(Parcel in) {
+    private ListUrlBuilder(Parcel in) {
         this.mMode = in.readInt();
         this.mPageIndex = in.readInt();
         this.mCategory = in.readInt();

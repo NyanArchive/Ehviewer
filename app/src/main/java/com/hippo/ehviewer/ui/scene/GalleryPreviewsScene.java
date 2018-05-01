@@ -115,15 +115,11 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
-        if (mHelper != null && 1 == mHelper.getShownViewIndex()) {
-            hasFirstRefresh = false;
-        } else {
-            hasFirstRefresh = mHasFirstRefresh;
-        }
+        hasFirstRefresh = (mHelper == null || 1 != mHelper.getShownViewIndex()) && mHasFirstRefresh;
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
         outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo);
     }
@@ -184,7 +180,7 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_previews);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -250,8 +246,8 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
         public GalleryPreviewHolder(View itemView) {
             super(itemView);
 
-            image = (LoadImageView) itemView.findViewById(R.id.image);
-            text = (TextView) itemView.findViewById(R.id.text);
+            image = itemView.findViewById(R.id.image);
+            text = itemView.findViewById(R.id.text);
         }
     }
 
@@ -264,14 +260,15 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
             Assert.assertNotNull(mInflater);
         }
 
+        @NonNull
         @Override
-        public GalleryPreviewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public GalleryPreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new GalleryPreviewHolder(mInflater.inflate(R.layout.item_gallery_preview, parent, false));
         }
 
         @Override
         @SuppressLint("SetTextI18n")
-        public void onBindViewHolder(GalleryPreviewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull GalleryPreviewHolder holder, int position) {
             if (null != mHelper) {
                 GalleryPreview preview = mHelper.getDataAt(position);
                 preview.load(holder.image);

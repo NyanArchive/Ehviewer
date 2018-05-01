@@ -23,6 +23,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -131,12 +132,9 @@ public class SecurityScene extends SolidScene implements
                         public void onAuthenticationSucceeded(
                                 FingerprintManager.AuthenticationResult result) {
                             mFingerprintIcon.setImageResource(R.drawable.ic_fingerprint_success);
-                            mFingerprintIcon.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startSceneForCheckStep(CHECK_STEP_SECURITY, getArguments());
-                                    finish();
-                                }
+                            mFingerprintIcon.postDelayed(() -> {
+                                startSceneForCheckStep(CHECK_STEP_SECURITY, getArguments());
+                                finish();
                             }, SUCCESS_DELAY_MILLIS);
 
                         }
@@ -158,7 +156,7 @@ public class SecurityScene extends SolidScene implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_RETRY_TIMES, mRetryTimes);
     }
@@ -254,12 +252,7 @@ public class SecurityScene extends SolidScene implements
         mFingerprintIcon.setImageResource(R.drawable.ic_fingerprint_error);
         mFingerprintIcon.removeCallbacks(mResetFingerprintRunnable);
         if (unrecoverable) {
-            mFingerprintIcon.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mFingerprintIcon.setVisibility(View.INVISIBLE);
-                }
-            }, ERROR_TIMEOUT_MILLIS);
+            mFingerprintIcon.postDelayed(() -> mFingerprintIcon.setVisibility(View.INVISIBLE), ERROR_TIMEOUT_MILLIS);
         } else {
             mFingerprintIcon.postDelayed(mResetFingerprintRunnable, ERROR_TIMEOUT_MILLIS);
         }

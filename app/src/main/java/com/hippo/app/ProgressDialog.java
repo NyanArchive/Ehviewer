@@ -16,6 +16,7 @@
 
 package com.hippo.app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -45,11 +46,11 @@ public class ProgressDialog extends AlertDialog {
     /** Creates a ProgressDialog with a circular, spinning progress
      * bar. This is the default.
      */
-    public static final int STYLE_SPINNER = 0;
+    private static final int STYLE_SPINNER = 0;
 
     /** Creates a ProgressDialog with a horizontal progress bar.
      */
-    public static final int STYLE_HORIZONTAL = 1;
+    private static final int STYLE_HORIZONTAL = 1;
 
     private ProgressBar mProgress;
     private TextView mMessageView;
@@ -117,6 +118,7 @@ public class ProgressDialog extends AlertDialog {
         return dialog;
     }
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -150,15 +152,15 @@ public class ProgressDialog extends AlertDialog {
                     }
                 }
             };
-            View view = inflater.inflate(R.layout.alert_dialog_progress_material, null);
-            mProgress = (ProgressBar) view.findViewById(R.id.progress);
-            mProgressNumber = (TextView) view.findViewById(R.id.progress_number);
-            mProgressPercent = (TextView) view.findViewById(R.id.progress_percent);
+            @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.alert_dialog_progress_material, null);
+            mProgress = view.findViewById(R.id.progress);
+            mProgressNumber = view.findViewById(R.id.progress_number);
+            mProgressPercent = view.findViewById(R.id.progress_percent);
             setView(view);
         } else {
-            View view = inflater.inflate(R.layout.progress_dialog_material, null);
-            mProgress = (ProgressBar) view.findViewById(R.id.progress);
-            mMessageView = (TextView) view.findViewById(R.id.message);
+            @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.progress_dialog_material, null);
+            mProgress = view.findViewById(R.id.progress);
+            mMessageView = view.findViewById(R.id.message);
             setView(view);
         }
         if (mMax > 0) {

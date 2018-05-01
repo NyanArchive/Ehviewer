@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -23,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Debug;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.hippo.scene.StageActivity;
 import com.hippo.util.PackageUtils;
@@ -39,6 +41,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 
 public final class Crash {
+
+    private static final String TAG = Crash.class.getSimpleName();
+
     private Crash() {}
 
     @NonNull
@@ -46,6 +51,7 @@ public final class Crash {
         return null != str ? str : "null";
     }
 
+    @SuppressLint("HardwareIds")
     @SuppressWarnings("deprecation")
     private static void collectInfo(Context context, FileWriter fw) throws IOException {
         try {
@@ -155,7 +161,9 @@ public final class Crash {
 
             Settings.putCrashFilename(fileName);
         } catch (Exception e) {
-            file.delete();
+            if (!file.delete()) {
+                Log.i(TAG, "Delete file failed: " + file);
+            }
         } finally {
             IOUtils.closeQuietly(fw);
         }
@@ -168,11 +176,8 @@ public final class Crash {
         }
 
         File dir = AppConfig.getExternalCrashDir();
-        if (dir == null) {
-            return false;
-        }
+        return dir != null && new File(dir, filename).isFile();
 
-        return new File(dir, filename).isFile();
     }
 
     public static String getCrashContent() {

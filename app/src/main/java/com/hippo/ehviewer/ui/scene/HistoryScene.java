@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -154,7 +155,7 @@ public class HistoryScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.history);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -208,21 +209,18 @@ public class HistoryScene extends ToolbarScene
         return R.menu.scene_history;
     }
 
-    private void showClearAllDialog() {
-        new AlertDialog.Builder(getContext2())
+    private void showClearAllDialog(Context context) {
+        new AlertDialog.Builder(context)
                 .setMessage(R.string.clear_all_history)
-                .setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
-                            return;
-                        }
-
-                        EhDB.clearHistoryInfo();
-                        updateLazyList();
-                        mAdapter.notifyDataSetChanged();
-                        updateView(true);
+                .setPositiveButton(R.string.clear_all, (dialog, which) -> {
+                    if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
+                        return;
                     }
+
+                    EhDB.clearHistoryInfo();
+                    updateLazyList();
+                    mAdapter.notifyDataSetChanged();
+                    updateView(true);
                 }).show();
     }
 
@@ -237,7 +235,7 @@ public class HistoryScene extends ToolbarScene
         int id = item.getItemId();
         switch (id) {
             case R.id.action_clear_all: {
-                showClearAllDialog();
+                showClearAllDialog(context);
                 return true;
             }
         }
@@ -273,19 +271,16 @@ public class HistoryScene extends ToolbarScene
         final GalleryInfo gi = mLazyList.get(position);
         new AlertDialog.Builder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
-                .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Download
-                                CommonOperations.startDownload(activity, gi, false);
-                                break;
-                            case 1: // Favorites
-                                CommonOperations.addToFavorites(activity, gi,
-                                        new addToFavoriteListener(context,
-                                                activity.getStageId(), getTag()));
-                                break;
-                        }
+                .setItems(R.array.gallery_list_menu_entries, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Download
+                            CommonOperations.startDownload(activity, gi, false);
+                            break;
+                        case 1: // Favorites
+                            CommonOperations.addToFavorites(activity, gi,
+                                    new addToFavoriteListener(context,
+                                            activity.getStageId(), getTag()));
+                            break;
                     }
                 }).show();
         return true;
@@ -304,13 +299,13 @@ public class HistoryScene extends ToolbarScene
         public HistoryHolder(View itemView) {
             super(itemView);
 
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
-            posted = (TextView) itemView.findViewById(R.id.posted);
-            simpleLanguage = (TextView) itemView.findViewById(R.id.simple_language);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
+            posted = itemView.findViewById(R.id.posted);
+            simpleLanguage = itemView.findViewById(R.id.simple_language);
         }
 
         @Override
@@ -324,7 +319,7 @@ public class HistoryScene extends ToolbarScene
 
         private final LayoutInflater mInflater;
 
-        public HistoryAdapter() {
+        private HistoryAdapter() {
             mInflater = getLayoutInflater2();
         }
 
@@ -337,13 +332,14 @@ public class HistoryScene extends ToolbarScene
             }
         }
 
+        @NonNull
         @Override
-        public HistoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public HistoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new HistoryHolder(mInflater.inflate(R.layout.item_gallery_list, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(HistoryHolder holder, int position) {
+        public void onBindViewHolder(@NonNull HistoryHolder holder, int position) {
             if (null == mLazyList) {
                 return;
             }
@@ -355,7 +351,7 @@ public class HistoryScene extends ToolbarScene
             holder.rating.setRating(gi.rating);
             TextView category = holder.category;
             String newCategoryText = EhUtils.getCategory(gi.category);
-            if (!newCategoryText.equals(category.getText())) {
+            if (!newCategoryText.equals(category.getText().toString())) {
                 category.setText(newCategoryText);
                 category.setBackgroundColor(EhUtils.getCategoryColor(gi.category));
             }
@@ -399,7 +395,7 @@ public class HistoryScene extends ToolbarScene
 
         private final int mPosition;
 
-        protected SwipeResultActionClear(int position) {
+        private SwipeResultActionClear(int position) {
             mPosition = position;
         }
 

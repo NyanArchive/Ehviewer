@@ -138,11 +138,11 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
         }
 
         final ActionBar ab = getSupportActionBar();
-        if (item.getItemId() == android.R.id.home && ab != null &&
-                (ab.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
-            return onSupportNavigateUp();
-        }
-        return false;
+        return item.getItemId() == android.R.id.home
+                && ab != null
+                && (ab.getDisplayOptions()
+                & ActionBar.DISPLAY_HOME_AS_UP) != 0
+                && onSupportNavigateUp();
     }
 
     @Override

@@ -24,7 +24,6 @@ import android.content.Context;
 import com.hippo.yorozuya.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -106,12 +105,7 @@ public class CookieRepository implements CookieJar {
     // RFC 6265 Section-5.4 step 2, sort the cookie-list
     // Cookies with longer paths are listed before cookies with shorter paths.
     // Ignore creation-time, we don't store them.
-    Collections.sort(accepted, new Comparator<Cookie>() {
-      @Override
-      public int compare(Cookie o1, Cookie o2) {
-        return o2.path().length() - o1.path().length();
-      }
-    });
+    Collections.sort(accepted, (o1, o2) -> o2.path().length() - o1.path().length());
 
     return accepted;
   }
@@ -172,16 +166,11 @@ public class CookieRepository implements CookieJar {
   protected static boolean domainMatch(HttpUrl url, String domain) {
     String urlHost = url.host();
 
-    if (urlHost.equals(domain)) {
-      return true; // As in 'example.com' matching 'example.com'.
-    }
+    // As in 'example.com' matching 'example.com'.
+    return urlHost.equals(domain)
+            || urlHost.endsWith(domain)
+            && urlHost.charAt(urlHost.length() - domain.length() - 1) == '.'
+            && !verifyAsIpAddress(urlHost);
 
-    if (urlHost.endsWith(domain)
-        && urlHost.charAt(urlHost.length() - domain.length() - 1) == '.'
-        && !verifyAsIpAddress(urlHost)) {
-      return true; // As in 'example.com' matching 'www.example.com'.
-    }
-
-    return false;
   }
 }

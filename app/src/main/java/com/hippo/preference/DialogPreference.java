@@ -284,7 +284,7 @@ public abstract class DialogPreference extends Preference implements
      * is displayed. Default is false. Subclasses should override this method if they need
      * the soft input method brought up automatically.
      */
-    protected boolean needInputMethod() {
+    private boolean needInputMethod() {
         return false;
     }
 
@@ -293,7 +293,8 @@ public abstract class DialogPreference extends Preference implements
      */
     private void requestInputMethod(Dialog dialog) {
         Window window = dialog.getWindow();
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (window != null)
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     /**
@@ -304,7 +305,7 @@ public abstract class DialogPreference extends Preference implements
      * @return The content View for the dialog.
      * @see #setLayoutResource(int)
      */
-    protected View onCreateDialogView() {
+    private View onCreateDialogView() {
         if (mDialogLayoutResId == 0) {
             return null;
         }
@@ -318,7 +319,7 @@ public abstract class DialogPreference extends Preference implements
      *
      * @param view The content View of the dialog, if it is custom.
      */
-    protected void onBindDialogView(View view) {}
+    private void onBindDialogView(View view) {}
 
     protected void onDialogCreated(AlertDialog dialog) {}
 
@@ -395,7 +396,7 @@ public abstract class DialogPreference extends Preference implements
         boolean isDialogShowing;
         Bundle dialogBundle;
 
-        public SavedState(Parcel source) {
+        private SavedState(Parcel source) {
             super(source);
             isDialogShowing = source.readInt() == 1;
             dialogBundle = source.readBundle(DialogPreference.class.getClassLoader());
@@ -408,7 +409,7 @@ public abstract class DialogPreference extends Preference implements
             dest.writeBundle(dialogBundle);
         }
 
-        public SavedState(Parcelable superState) {
+        private SavedState(Parcelable superState) {
             super(superState);
         }
 

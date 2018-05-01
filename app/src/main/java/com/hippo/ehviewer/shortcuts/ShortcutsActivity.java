@@ -30,7 +30,7 @@ public class ShortcutsActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String action = null;
+        String action;
         Intent intent = getIntent();
         if (intent != null){
             action = intent.getAction();

@@ -373,13 +373,14 @@ public class ExcludedLanguagesActivity extends ToolbarActivity
 
     private class LanguageAdapter extends RecyclerView.Adapter<LanguageHolder> {
 
+        @NonNull
         @Override
-        public LanguageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public LanguageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new LanguageHolder(getLayoutInflater().inflate(R.layout.item_excluded_languages, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(LanguageHolder holder, int position) {
+        public void onBindViewHolder(@NonNull LanguageHolder holder, int position) {
             holder.language.setText(LANGUAGE_STR_IDS[position]);
             boolean[] selections = mSelections[position];
             holder.original.setChecked(selections[0]);

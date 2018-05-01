@@ -148,7 +148,7 @@ public class RecaptchaView extends LoadImageView implements RecaptchaV1.Recaptch
     private String challenge;
     private String image;
 
-    public SavedState(Parcelable superState) {
+    private SavedState(Parcelable superState) {
       super(superState);
     }
 

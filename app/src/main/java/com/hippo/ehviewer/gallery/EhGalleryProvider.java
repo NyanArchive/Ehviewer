@@ -78,11 +78,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
 
     @Override
     public boolean save(int index, @NonNull UniFile file) {
-        if (null != mSpiderQueen) {
-            return mSpiderQueen.save(index, file);
-        } else {
-            return false;
-        }
+        return null != mSpiderQueen && mSpiderQueen.save(index, file);
     }
 
     @Nullable

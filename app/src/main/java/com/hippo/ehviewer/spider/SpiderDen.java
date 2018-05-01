@@ -93,8 +93,8 @@ public final class SpiderDen {
                     for (UniFile file : files) {
                         if (file.isDirectory()) {
                             String name = file.getName();
-                            int length = name.length();
-                            if (length > maxLength) {
+                            int length;
+                            if (name != null && (length = name.length()) > maxLength) {
                                 maxLength = length;
                                 dirname = name;
                             }
@@ -252,10 +252,9 @@ public final class SpiderDen {
     public boolean contain(int index) {
         if (mMode == SpiderQueen.MODE_READ) {
             return containInCache(index) || containInDownloadDir(index);
-        } else if (mMode == SpiderQueen.MODE_DOWNLOAD) {
-            return containInDownloadDir(index) || copyFromCacheToDownloadDir(index);
         } else {
-            return false;
+            return mMode == SpiderQueen.MODE_DOWNLOAD && (containInDownloadDir(index) ||
+                    copyFromCacheToDownloadDir(index));
         }
     }
 
@@ -322,17 +321,18 @@ public final class SpiderDen {
 
     @Nullable
     public OutputStreamPipe openOutputStreamPipe(int index, @Nullable String extension) {
-        if (mMode == SpiderQueen.MODE_READ) {
-            // Return the download pipe is the gallery has been downloaded
-            OutputStreamPipe pipe = openDownloadOutputStreamPipe(index, extension);
-            if (pipe == null) {
-                pipe = openCacheOutputStreamPipe(index);
-            }
-            return pipe;
-        } else if (mMode == SpiderQueen.MODE_DOWNLOAD) {
-            return openDownloadOutputStreamPipe(index, extension);
-        } else {
-            return null;
+        switch (mMode) {
+            case SpiderQueen.MODE_READ:
+                // Return the download pipe is the gallery has been downloaded
+                OutputStreamPipe pipe = openDownloadOutputStreamPipe(index, extension);
+                if (pipe == null) {
+                    pipe = openCacheOutputStreamPipe(index);
+                }
+                return pipe;
+            case SpiderQueen.MODE_DOWNLOAD:
+                return openDownloadOutputStreamPipe(index, extension);
+            default:
+                return null;
         }
     }
 
@@ -368,16 +368,17 @@ public final class SpiderDen {
 
     @Nullable
     public InputStreamPipe openInputStreamPipe(int index) {
-        if (mMode == SpiderQueen.MODE_READ) {
-            InputStreamPipe pipe = openCacheInputStreamPipe(index);
-            if (pipe == null) {
-                pipe = openDownloadInputStreamPipe(index);
-            }
-            return pipe;
-        } else if (mMode == SpiderQueen.MODE_DOWNLOAD) {
-            return openDownloadInputStreamPipe(index);
-        } else {
-            return null;
+        switch (mMode) {
+            case SpiderQueen.MODE_READ:
+                InputStreamPipe pipe = openCacheInputStreamPipe(index);
+                if (pipe == null) {
+                    pipe = openDownloadInputStreamPipe(index);
+                }
+                return pipe;
+            case SpiderQueen.MODE_DOWNLOAD:
+                return openDownloadInputStreamPipe(index);
+            default:
+                return null;
         }
     }
 }

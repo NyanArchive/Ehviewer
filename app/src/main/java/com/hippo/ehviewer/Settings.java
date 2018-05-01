@@ -970,7 +970,7 @@ public class Settings {
 
     @SuppressLint("CommitPrefEdits")
     public static void putCrashFilename(String value) {
-        sSettingsPre.edit().putString(KEY_CRASH_FILENAME, value).commit();
+        sSettingsPre.edit().putString(KEY_CRASH_FILENAME, value).apply();
     }
 
     /********************

@@ -65,25 +65,21 @@ public class Hosts {
       return null;
     }
 
-    Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST  + " = ?;", new String[] {host});
-    try {
+    try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + "" +
+            " = ?;", new String[]{host})) {
       if (cursor.moveToNext()) {
         String ip = SqlUtils.getString(cursor, COLUMN_IP, null);
         return toInetAddress(host, ip);
       } else {
         return null;
       }
-    } finally {
-      cursor.close();
     }
   }
 
   private boolean contains(String host) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST  + " = ?;", new String[] {host});
-    try {
+    try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + "" +
+            " = ?;", new String[]{host})) {
       return cursor.moveToNext();
-    } finally {
-      cursor.close();
     }
   }
 
@@ -121,8 +117,7 @@ public class Hosts {
   public List<Pair<String, String>> getAll() {
     List<Pair<String, String>> result = new ArrayList<>();
 
-    Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + ";", null);
-    try {
+    try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + ";", null)) {
       while (cursor.moveToNext()) {
         String host = SqlUtils.getString(cursor, COLUMN_HOST, null);
         String ip = SqlUtils.getString(cursor, COLUMN_IP, null);
@@ -134,8 +129,6 @@ public class Hosts {
 
         result.add(new Pair<>(host, ip));
       }
-    } finally {
-      cursor.close();
     }
 
     return result;
@@ -196,11 +189,7 @@ public class Hosts {
       }
     }
 
-    if (labelLength < 1 || labelLength > 63) {
-      return false;
-    }
-
-    return true;
+    return labelLength >= 1 && labelLength <= 63;
   }
 
   /**

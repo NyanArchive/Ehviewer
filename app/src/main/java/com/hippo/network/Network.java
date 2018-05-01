@@ -25,8 +25,8 @@ public final class Network {
 
     public static int getActiveNetworkType(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (activeNetwork != null) {
+        NetworkInfo activeNetwork;
+        if (cm != null && (activeNetwork = cm.getActiveNetworkInfo()) != null) {
             return activeNetwork.getType();
         } else {
             return -1;

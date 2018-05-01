@@ -213,15 +213,8 @@ public final class EhFilter {
             filterName = filter.substring(index + 1);
         }
 
-        if (null != tagNamespace && null != filterNamespace &&
-                !tagNamespace.equals(filterNamespace)) {
-            return false;
-        }
-        if (!tagName.equals(filterName)) {
-            return false;
-        }
-
-        return true;
+        return (null == tagNamespace || null == filterNamespace || tagNamespace.equals(filterNamespace))
+                && tagName.equals(filterName);
     }
 
     public synchronized boolean filterTag(GalleryInfo info) {
