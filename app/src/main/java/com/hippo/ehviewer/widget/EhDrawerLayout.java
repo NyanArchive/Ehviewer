@@ -18,11 +18,10 @@ package com.hippo.ehviewer.widget;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -33,8 +32,7 @@ import com.hippo.yorozuya.AnimationUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@CoordinatorLayout.DefaultBehavior(EhDrawerLayout.Behavior.class)
-public class EhDrawerLayout extends DrawerLayout {
+public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.AttachedBehavior {
 
     private List<View> mAboveSnackViewList;
 
@@ -73,16 +71,19 @@ public class EhDrawerLayout extends DrawerLayout {
         }
     }
 
+    @NonNull
+    @Override
+    public CoordinatorLayout.Behavior getBehavior() {
+        return new Behavior();
+    }
+
     public static class Behavior extends CoordinatorLayout.Behavior<EhDrawerLayout> {
-        // We only support the FAB <> Snackbar shift movement on Honeycomb and above. This is
-        // because we can use view translation properties which greatly simplifies the code.
-        private static final boolean SNACKBAR_BEHAVIOR_ENABLED = Build.VERSION.SDK_INT >= 11;
 
         @Override
         public boolean layoutDependsOn(CoordinatorLayout parent,
                 EhDrawerLayout child, View dependency) {
             // We're dependent on all SnackbarLayouts (if enabled)
-            return SNACKBAR_BEHAVIOR_ENABLED && dependency instanceof Snackbar.SnackbarLayout;
+            return dependency instanceof Snackbar.SnackbarLayout;
         }
 
         @Override
@@ -91,7 +92,9 @@ public class EhDrawerLayout extends DrawerLayout {
             if (dependency instanceof Snackbar.SnackbarLayout) {
                 for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                     View view = child.getAboveSnackViewAt(i);
-                    updateChildTranslationForSnackbar(parent, child, view);
+                    if (view != null) {
+                        updateChildTranslationForSnackbar(parent, child, view);
+                    }
                 }
             }
             return false;
@@ -120,7 +123,7 @@ public class EhDrawerLayout extends DrawerLayout {
                 fabTranslationYAnimator.cancel();
             }
 
-            final float currentTransY = ViewCompat.getTranslationY(child);
+            final float currentTransY = child.getTranslationY();
 
             if (child.isShown()
                     && Math.abs(currentTransY - targetTransY) > (child.getHeight() * 0.667f)) {
@@ -133,7 +136,7 @@ public class EhDrawerLayout extends DrawerLayout {
                             new ValueAnimator.AnimatorUpdateListener() {
                                 @Override
                                 public void onAnimationUpdate(ValueAnimator animation) {
-                                    ViewCompat.setTranslationY(child, (Float) animation.getAnimatedValue());
+                                    child.setTranslationY((Float) animation.getAnimatedValue());
                                 }
                             });
                     child.setTag(R.id.fab_translation_y_animator, fabTranslationYAnimator);
@@ -142,7 +145,7 @@ public class EhDrawerLayout extends DrawerLayout {
                 fabTranslationYAnimator.start();
             } else {
                 // Now update the translation Y
-                ViewCompat.setTranslationY(child, targetTransY);
+                child.setTranslationY(targetTransY);
             }
 
             child.setTag(R.id.fab_translation_y, targetTransY);
@@ -156,7 +159,7 @@ public class EhDrawerLayout extends DrawerLayout {
                 final View view = dependencies.get(i);
                 if (view instanceof Snackbar.SnackbarLayout && parent.doViewsOverlap(child, view)) {
                     minOffset = Math.min(minOffset,
-                            ViewCompat.getTranslationY(view) - view.getHeight());
+                            view.getTranslationY() - view.getHeight());
                 }
             }
 
