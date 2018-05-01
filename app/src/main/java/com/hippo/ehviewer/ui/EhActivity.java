@@ -24,8 +24,8 @@ import android.view.WindowManager;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.hippo.content.ContextLocalWrapper;
 import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.GetLocale;
 import com.hippo.ehviewer.Settings;
-import java.util.Locale;
 
 public abstract class EhActivity extends AppCompatActivity {
 
@@ -78,23 +78,6 @@ public abstract class EhActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        Locale locale = null;
-        String language = Settings.getAppLanguage();
-        if (language != null && !language.equals("system")) {
-            String[] split = language.split("-");
-            if (split.length == 1) {
-                locale = new Locale(split[0]);
-            } else if (split.length == 2) {
-                locale = new Locale(split[0], split[1]);
-            } else if (split.length == 3) {
-                locale = new Locale(split[0], split[1], split[2]);
-            }
-        }
-
-        if (locale != null) {
-            newBase = ContextLocalWrapper.wrap(newBase, locale);
-        }
-
-        super.attachBaseContext(newBase);
+        super.attachBaseContext(ContextLocalWrapper.wrap(newBase, GetLocale.getLocale()));
     }
 }

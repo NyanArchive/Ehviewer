@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -40,11 +39,10 @@ import java.io.File;
 import java.util.Arrays;
 
 public class AdvancedFragment extends PreferenceFragment
-    implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+    implements Preference.OnPreferenceClickListener {
 
     private static final String KEY_DUMP_LOGCAT = "dump_logcat";
     private static final String KEY_CLEAR_MEMORY_CACHE = "clear_memory_cache";
-    private static final String KEY_APP_LANGUAGE = "app_language";
     private static final String KEY_EXPORT_DATA = "export_data";
     private static final String KEY_IMPORT_DATA = "import_data";
 
@@ -58,7 +56,6 @@ public class AdvancedFragment extends PreferenceFragment
 
         Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);
         Preference clearMemoryCache = findPreference(KEY_CLEAR_MEMORY_CACHE);
-        Preference appLanguage = findPreference(KEY_APP_LANGUAGE);
         Preference exportData = findPreference(KEY_EXPORT_DATA);
         Preference importData = findPreference(KEY_IMPORT_DATA);
 
@@ -66,8 +63,6 @@ public class AdvancedFragment extends PreferenceFragment
         clearMemoryCache.setOnPreferenceClickListener(this);
         exportData.setOnPreferenceClickListener(this);
         importData.setOnPreferenceClickListener(this);
-
-        appLanguage.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -97,22 +92,10 @@ public class AdvancedFragment extends PreferenceFragment
             ((EhApplication) getActivity().getApplication()).clearMemoryCache();
             Runtime.getRuntime().gc();
         } else if (KEY_EXPORT_DATA.equals(key)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                showExportDialog();
-                return true;
-
-            } else if (defaultExportData()){
-                    return true;
-            }
-            Toast.makeText(getActivity(),R.string.settings_advanced_export_data_failed, Toast.LENGTH_SHORT).show();
+            showExportDialog();
             return true;
         } else if (KEY_IMPORT_DATA.equals(key)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                showImportDialog();
-            } else {
-                defaulfImportData();
-            }
-
+            showImportDialog();
             getActivity().setResult(Activity.RESULT_OK);
             return true;
         }
@@ -131,7 +114,10 @@ public class AdvancedFragment extends PreferenceFragment
             public void onClick(DialogInterface dialogInterface, int i) {
                 switch (i){
                     case 0:
-                        defaultExportData();
+                        if (defaultExportData()){
+                            break;
+                        }
+                        Toast.makeText(getActivity(),R.string.settings_advanced_export_data_failed, Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         customExportData();
@@ -246,15 +232,5 @@ public class AdvancedFragment extends PreferenceFragment
                 Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String key = preference.getKey();
-        if (KEY_APP_LANGUAGE.equals(key)) {
-            ((EhApplication) getActivity().getApplication()).recreate();
-            return true;
-        }
-        return false;
     }
 }

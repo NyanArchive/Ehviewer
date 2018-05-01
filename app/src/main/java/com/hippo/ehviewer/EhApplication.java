@@ -19,6 +19,7 @@ package com.hippo.ehviewer;
 import android.app.Activity;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -40,6 +41,7 @@ import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
+import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.image.Image;
 import com.hippo.image.ImageBitmap;
 import com.hippo.network.StatusCodeException;
@@ -140,7 +142,7 @@ public class EhApplication extends RecordingApplication implements SharedPrefere
         sp.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private void setNightMode(){
+    public void setNightMode(){
         String mode = Settings.getNightMode();
         switch (mode) {
             case "system":
@@ -372,9 +374,17 @@ public class EhApplication extends RecordingApplication implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Settings.KEY_NIGHT_MODE.equals(key)) {
-            setNightMode();
-            recreate();
+        Intent intent = new Intent(this, MainActivity.class);
+        switch (key) {
+            case Settings.KEY_NIGHT_MODE:
+                setNightMode();
+                startActivity(intent);
+                recreate();
+                break;
+            case Settings.KEY_APP_LANGUAGE:
+                startActivity(intent);
+                recreate();
+                break;
         }
     }
 }
