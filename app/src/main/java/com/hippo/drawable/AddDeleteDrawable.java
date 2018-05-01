@@ -26,7 +26,6 @@ import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.MathUtils;
@@ -110,7 +109,7 @@ public class AddDeleteDrawable extends Drawable {
     /**
      * If set, canvas is flipped when progress reached to end and going back to start.
      */
-    protected void setVerticalMirror(boolean verticalMirror) {
+    private void setVerticalMirror(boolean verticalMirror) {
         mVerticalMirror = verticalMirror;
     }
 
@@ -144,7 +143,7 @@ public class AddDeleteDrawable extends Drawable {
         setShape(true, duration);
     }
 
-    public void setShape(boolean delete, long duration) {
+    private void setShape(boolean delete, long duration) {
         if (!((!delete && mProgress == 0f) || (delete && mProgress == 1f))) {
             float endProgress = delete ? 1f : 0f;
             if (duration <= 0) {
@@ -152,9 +151,7 @@ public class AddDeleteDrawable extends Drawable {
             } else {
                 ObjectAnimator oa = ObjectAnimator.ofFloat(this, "progress", endProgress);
                 oa.setDuration(duration);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    oa.setAutoCancel(true);
-                }
+                oa.setAutoCancel(true);
                 oa.start();
             }
         }

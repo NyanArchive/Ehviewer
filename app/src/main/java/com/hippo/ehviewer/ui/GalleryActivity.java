@@ -29,13 +29,13 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,6 +85,8 @@ import java.io.OutputStream;
 
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
         GalleryView.Listener {
+
+    private static final String TAG = GalleryActivity.class.getSimpleName();
 
     public static final String ACTION_DIR = "dir";
     public static final String ACTION_ZIP = "zip";
@@ -247,7 +249,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     @SuppressWarnings({"deprecation", "WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (Settings.getReadingFullscreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -312,11 +314,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         // System UI helper
         if (Settings.getReadingFullscreen()) {
             int systemUiLevel;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                systemUiLevel = SystemUiHelper.LEVEL_IMMERSIVE;
-            } else {
-                systemUiLevel = SystemUiHelper.LEVEL_HIDE_STATUS_BAR;
-            }
+            systemUiLevel = SystemUiHelper.LEVEL_IMMERSIVE;
             mSystemUiHelper = new SystemUiHelper(this, systemUiLevel,
                     SystemUiHelper.FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES | SystemUiHelper.FLAG_IMMERSIVE_STICKY);
             mSystemUiHelper.hide();
@@ -339,7 +337,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
         mSize = mGalleryProvider.size();
         mCurrentIndex = startPage;
-        mLayoutMode = mGalleryView.getLayoutMode();
+        if(mGalleryView != null) {
+            mLayoutMode = mGalleryView.getLayoutMode();
+        }
         updateSlider();
 
         // Update keep screen on
@@ -930,8 +930,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (resultData != null){
-                Uri uri = resultData.getData();
+            Uri uri;
+            if (resultData != null && (uri = resultData.getData()) != null){
                 String filepath = getCacheDir() + "/" + mCacheFileName;
                 File cachefile = new File(filepath);
 
@@ -950,7 +950,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     IOUtils.closeQuietly(os);
                 }
 
-                cachefile.delete();
+                if (!cachefile.delete()) {
+                    Log.i(TAG,"Cannot delete file: " + cachefile);
+                }
 
                 Toast.makeText(this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show();
                 // Sync media store
@@ -964,19 +966,12 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         AlertDialog.Builder builder = new AlertDialog.Builder(GalleryActivity.this);
         builder.setTitle(resources.getString(R.string.page_menu_title, page + 1));
 
-        final CharSequence[] items;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            items = new CharSequence[]{
-                    getString(R.string.page_menu_refresh),
-                    getString(R.string.page_menu_share),
-                    getString(R.string.page_menu_save),
-                    getString(R.string.page_menu_save_to)};
-        }else {
-            items = new CharSequence[]{
-                    getString(R.string.page_menu_refresh),
-                    getString(R.string.page_menu_share),
-                    getString(R.string.page_menu_save)};
-        }
+        final CharSequence[] items = new CharSequence[]{
+                getString(R.string.page_menu_refresh),
+                getString(R.string.page_menu_share),
+                getString(R.string.page_menu_save),
+                getString(R.string.page_menu_save_to)};
+
         pageDialogListener(builder, items, page);
         builder.show();
     }
@@ -1009,12 +1004,12 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     private class NotifyTask implements Runnable {
 
-        public static final int KEY_LAYOUT_MODE = 0;
-        public static final int KEY_SIZE = 1;
-        public static final int KEY_CURRENT_INDEX = 2;
-        public static final int KEY_TAP_SLIDER_AREA = 3;
-        public static final int KEY_TAP_MENU_AREA = 4;
-        public static final int KEY_LONG_PRESS_PAGE = 5;
+        private static final int KEY_LAYOUT_MODE = 0;
+        private static final int KEY_SIZE = 1;
+        private static final int KEY_CURRENT_INDEX = 2;
+        private static final int KEY_TAP_SLIDER_AREA = 3;
+        private static final int KEY_TAP_MENU_AREA = 4;
+        private static final int KEY_LONG_PRESS_PAGE = 5;
 
         private int mKey;
         private int mValue;
@@ -1084,7 +1079,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     private class GalleryAdapter extends SimpleAdapter {
 
-        public GalleryAdapter(@NonNull GLRootView glRootView, @NonNull GalleryProvider provider) {
+        private GalleryAdapter(@NonNull GLRootView glRootView, @NonNull GalleryProvider provider) {
             super(glRootView, provider);
         }
 

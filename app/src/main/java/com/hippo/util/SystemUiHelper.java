@@ -17,10 +17,8 @@
 package com.hippo.util;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.WindowManager;
 
 /**
  * Helper for controlling the visibility of the System UI across the various API levels. To use
@@ -114,24 +112,13 @@ public final class SystemUiHelper {
      *              {@link #FLAG_IMMERSIVE_STICKY}
      * @param listener A listener which is called when the system visibility is changed
      */
-    public SystemUiHelper(Activity activity, int level, int flags,
+    private SystemUiHelper(Activity activity, int level, int flags,
             OnVisibilityChangeListener listener) {
 
         mHandler = new Handler(Looper.getMainLooper());
         mHideRunnable = new HideRunnable();
 
-        // Create impl
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mImpl = new SystemUiHelperImplKK(activity, level, flags, listener);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mImpl = new SystemUiHelperImplJB(activity, level, flags, listener);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mImpl = new SystemUiHelperImplICS(activity, level, flags, listener);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            mImpl = new SystemUiHelperImplHC(activity, level, flags, listener);
-        } else {
-            mImpl = new SystemUiHelperImplBase(activity, level, flags, listener);
-        }
+        mImpl = new SystemUiHelperImplKK(activity, level, flags, listener);
     }
 
     /**
@@ -186,7 +173,7 @@ public final class SystemUiHelper {
     /**
      * Toggle whether the system UI is displayed.
      */
-    public void toggle() {
+    private void toggle() {
         if (mImpl.isShowing()) {
             mImpl.hide();
         } else {
@@ -240,39 +227,6 @@ public final class SystemUiHelper {
 
             if (mOnVisibilityChangeListener != null) {
                 mOnVisibilityChangeListener.onVisibilityChange(mIsShowing);
-            }
-        }
-    }
-
-    /**
-     * Base implementation. Used on API level 10 and below.
-     */
-    static class SystemUiHelperImplBase extends SystemUiHelperImpl {
-
-        SystemUiHelperImplBase(Activity activity, int level, int flags,
-                OnVisibilityChangeListener onVisibilityChangeListener) {
-            super(activity, level, flags, onVisibilityChangeListener);
-
-            if ((mFlags & SystemUiHelper.FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES) != 0) {
-                mActivity.getWindow().addFlags(
-                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            }
-        }
-
-        @Override
-        void show() {
-            if (mLevel > SystemUiHelper.LEVEL_LOW_PROFILE) {
-                mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                setIsShowing(true);
-            }
-        }
-
-        @Override
-        void hide() {
-            if (mLevel > SystemUiHelper.LEVEL_LOW_PROFILE) {
-                mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                setIsShowing(false);
             }
         }
     }

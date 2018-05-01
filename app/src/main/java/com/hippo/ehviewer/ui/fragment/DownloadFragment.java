@@ -21,7 +21,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -87,27 +86,10 @@ public class DownloadFragment extends PreferenceFragment implements
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         if (KEY_DOWNLOAD_LOCATION.equals(key)) {
-            int sdk = Build.VERSION.SDK_INT;
-            if (sdk < Build.VERSION_CODES.KITKAT) {
-                openDirPicker();
-            } else if (sdk < Build.VERSION_CODES.LOLLIPOP) {
-                showDirPickerDialogKK();
-            } else {
-                showDirPickerDialogL();
-            }
+            showDirPickerDialogL();
             return true;
         }
         return false;
-    }
-
-    private void showDirPickerDialogKK() {
-        new AlertDialog.Builder(getActivity()).setMessage(R.string.settings_download_pick_dir_kk)
-                .setPositiveButton(R.string.settings_download_continue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        openDirPicker();
-                    }
-                }).show();
     }
 
     private void showDirPickerDialogL() {
@@ -141,13 +123,11 @@ public class DownloadFragment extends PreferenceFragment implements
     }
 
     private void openDirPickerL() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            try {
-                startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(getActivity(), R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
-            }
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        try {
+            startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(getActivity(), R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -168,17 +148,20 @@ public class DownloadFragment extends PreferenceFragment implements
                 break;
             }
             case REQUEST_CODE_PICK_IMAGE_DIR_L: {
-                if (resultCode == Activity.RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (resultCode == Activity.RESULT_OK) {
                     Uri treeUri = data.getData();
-                    getActivity().getContentResolver().takePersistableUriPermission(
-                            treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
-                    if (uniFile != null) {
-                        Settings.putDownloadLocation(uniFile);
-                        onUpdateDownloadLocation();
-                    } else {
-                        Toast.makeText(getActivity(), R.string.settings_download_cant_get_download_location,
-                                Toast.LENGTH_SHORT).show();
+                    if (treeUri != null) {
+                        getActivity().getContentResolver().takePersistableUriPermission(
+                                treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
+                        if (uniFile != null) {
+                            Settings.putDownloadLocation(uniFile);
+                            onUpdateDownloadLocation();
+                        } else {
+                            Toast.makeText(getActivity(), R.string.settings_download_cant_get_download_location,
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
                 break;

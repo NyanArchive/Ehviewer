@@ -23,29 +23,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.ViewDebug.ExportedProperty;
-import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class TextClock extends TextView {
+public class TextClock extends AppCompatTextView {
 
     public static final CharSequence DEFAULT_FORMAT_12_HOUR = "hh:mm a";
-    public static final CharSequence DEFAULT_FORMAT_24_HOUR;
-
-    static {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
-            DEFAULT_FORMAT_24_HOUR = "kk:mm";
-        else
-            DEFAULT_FORMAT_24_HOUR = "HH:mm";
-    }
+    public static final CharSequence DEFAULT_FORMAT_24_HOUR = "HH:mm";
 
     private CharSequence mFormat12;
     private CharSequence mFormat24;

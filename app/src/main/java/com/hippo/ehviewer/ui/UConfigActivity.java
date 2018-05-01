@@ -24,7 +24,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -33,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -63,17 +61,9 @@ public class UConfigActivity extends ToolbarActivity {
 
     // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
     CookieManager cookieManager = CookieManager.getInstance();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      cookieManager.flush();
-      cookieManager.removeAllCookies(null);
-      cookieManager.removeSessionCookies(null);
-    } else {
-      CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
-      cookieSyncManager.startSync();
-      cookieManager.removeAllCookie();
-      cookieManager.removeSessionCookie();
-      cookieSyncManager.stopSync();
-    }
+    cookieManager.flush();
+    cookieManager.removeAllCookies(null);
+    cookieManager.removeSessionCookies(null);
 
     // Copy cookies from okhttp cookie store to CookieManager
     url = EhUrl.getUConfigUrl();

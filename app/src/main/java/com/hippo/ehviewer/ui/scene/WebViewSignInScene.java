@@ -18,14 +18,12 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.hippo.ehviewer.EhApplication;
@@ -65,17 +63,9 @@ public class WebViewSignInScene extends SolidScene {
 
         // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
         CookieManager cookieManager = CookieManager.getInstance();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.flush();
-            cookieManager.removeAllCookies(null);
-            cookieManager.removeSessionCookies(null);
-        } else {
-            CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(context);
-            cookieSyncManager.startSync();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncManager.stopSync();
-        }
+        cookieManager.flush();
+        cookieManager.removeAllCookies(null);
+        cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -96,7 +86,7 @@ public class WebViewSignInScene extends SolidScene {
 
     private class LoginWebViewClient extends WebViewClient {
 
-        public List<Cookie> parseCookies(HttpUrl url, String cookieStrings) {
+        private List<Cookie> parseCookies(HttpUrl url, String cookieStrings) {
             if (cookieStrings == null) {
                 return Collections.emptyList();
             }

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -335,7 +334,9 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
     public void showImeAndSuggestionsList(boolean animation) {
         // Show ime
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mEditText, 0);
+        if (imm != null) {
+            imm.showSoftInput(mEditText, 0);
+        }
         // update suggestion for show suggestions list
         updateSuggestions();
         // Show suggestions list
@@ -355,9 +356,7 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
                     mInAnimation = false;
                 }
             });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                oa.setAutoCancel(true);
-            }
+            oa.setAutoCancel(true);
             oa.start();
         } else {
             mListContainer.setVisibility(View.VISIBLE);
@@ -372,7 +371,9 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
     private void hideImeAndSuggestionsList(boolean animation) {
         // Hide ime
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+        if (imm != null){
+            imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+        }
         // Hide suggestions list
         if (animation) {
             ObjectAnimator oa = ObjectAnimator.ofFloat(this, "progress", 0f);
@@ -390,9 +391,7 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
                     mInAnimation = false;
                 }
             });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                oa.setAutoCancel(true);
-            }
+            oa.setAutoCancel(true);
             oa.start();
         } else {
             setProgress(0f);

@@ -678,12 +678,10 @@ public class EhDB {
             IOUtils.closeQuietly(os);
         }
         // Delete failed file
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                DocumentsContract.deleteDocument(resolver, uri);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+        try {
+            DocumentsContract.deleteDocument(resolver, uri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
 
         return false;

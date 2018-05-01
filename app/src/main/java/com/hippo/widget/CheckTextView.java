@@ -23,7 +23,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -31,16 +30,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Interpolator;
-import android.widget.TextView;
+import android.support.v7.widget.AppCompatTextView;
 
 import com.hippo.ehviewer.R;
-import com.hippo.hotspot.Hotspot;
 import com.hippo.hotspot.Hotspotable;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 
-public class CheckTextView extends TextView implements OnClickListener, Hotspotable {
+public class CheckTextView extends AppCompatTextView implements OnClickListener, Hotspotable {
 
     private static final String STATE_KEY_SUPER = "super";
     private static final String STATE_KEY_CHECKED = "checked";
@@ -80,9 +78,6 @@ public class CheckTextView extends TextView implements OnClickListener, Hotspota
         mPaint.setColor(mMaskColor);
 
         setOnClickListener(this);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Hotspot.addHotspotable(this, this);
-        }
     }
 
     @Override

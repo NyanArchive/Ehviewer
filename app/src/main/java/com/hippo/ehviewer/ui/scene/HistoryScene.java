@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -60,7 +59,6 @@ import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.util.ApiHelper;
 import com.hippo.util.DrawableManager;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.LoadImageView;
@@ -209,8 +207,8 @@ public class HistoryScene extends ToolbarScene
         return R.menu.scene_history;
     }
 
-    private void showClearAllDialog() {
-        new AlertDialog.Builder(getContext2())
+    private void showClearAllDialog(Context context) {
+        new AlertDialog.Builder(context)
                 .setMessage(R.string.clear_all_history)
                 .setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() {
                     @Override
@@ -238,7 +236,7 @@ public class HistoryScene extends ToolbarScene
         int id = item.getItemId();
         switch (id) {
             case R.id.action_clear_all: {
-                showClearAllDialog();
+                showClearAllDialog(context);
                 return true;
             }
         }
@@ -256,7 +254,7 @@ public class HistoryScene extends ToolbarScene
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, mLazyList.get(position));
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
         View thumb;
-        if (ApiHelper.SUPPORT_TRANSITION && null != (thumb = view.findViewById(R.id.thumb))) {
+        if (null != (thumb = view.findViewById(R.id.thumb))) {
             announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
         }
         startScene(announcer);
@@ -302,7 +300,7 @@ public class HistoryScene extends ToolbarScene
         public final TextView posted;
         public final TextView simpleLanguage;
 
-        public HistoryHolder(View itemView) {
+        private HistoryHolder(View itemView) {
             super(itemView);
 
             thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
@@ -325,7 +323,7 @@ public class HistoryScene extends ToolbarScene
 
         private final LayoutInflater mInflater;
 
-        public HistoryAdapter() {
+        private HistoryAdapter() {
             mInflater = getLayoutInflater2();
         }
 
@@ -365,10 +363,8 @@ public class HistoryScene extends ToolbarScene
             holder.simpleLanguage.setText(gi.simpleLanguage);
 
             // Update transition name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                long gid = gi.gid;
-                holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
-            }
+            long gid = gi.gid;
+            holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
         }
 
         @Override
@@ -401,7 +397,7 @@ public class HistoryScene extends ToolbarScene
 
         private final int mPosition;
 
-        protected SwipeResultActionClear(int position) {
+        private SwipeResultActionClear(int position) {
             mPosition = position;
         }
 
@@ -422,7 +418,7 @@ public class HistoryScene extends ToolbarScene
 
     private static class addToFavoriteListener extends EhCallback<HistoryScene, Void> {
 
-        public addToFavoriteListener(Context context, int stageId, String sceneTag) {
+        private addToFavoriteListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
         }
 

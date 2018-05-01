@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -48,9 +47,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     @Retention(RetentionPolicy.SOURCE)
     public @interface Type {}
 
-    public static final int TYPE_INVALID = -1;
-    public static final int TYPE_LIST = 0;
-    public static final int TYPE_GRID = 1;
+    private static final int TYPE_INVALID = -1;
+    private static final int TYPE_LIST = 0;
+    private static final int TYPE_GRID = 1;
 
     private final LayoutInflater mInflater;
     private final Resources mResources;
@@ -160,7 +159,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     public abstract GalleryInfo getDataAt(int position);
 
     @Override
-    public void onBindViewHolder(GalleryHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GalleryHolder holder, int position) {
         GalleryInfo gi = getDataAt(position);
         if (null == gi) {
             return;
@@ -191,7 +190,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 int color = EhUtils.getCategoryColor(gi.category);
                 if (!(drawable instanceof TriangleDrawable)) {
                     drawable = new TriangleDrawable(color);
-                    category.setBackgroundDrawable(drawable);
+                    category.setBackground(drawable);
                 } else {
                     ((TriangleDrawable) drawable).setColor(color);
                 }
@@ -201,9 +200,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         }
 
         // Update transition name
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            long gid = gi.gid;
-            holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
-        }
+        long gid = gi.gid;
+        holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
     }
 }

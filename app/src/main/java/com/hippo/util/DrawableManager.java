@@ -16,30 +16,20 @@
 
 package com.hippo.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v7.widget.AppCompatDrawableManager;
 
 public final class DrawableManager {
 
+    @SuppressLint("RestrictedApi")
     private static final AppCompatDrawableManager sManager = AppCompatDrawableManager.get();
 
+    @SuppressLint("RestrictedApi")
     public static Drawable getDrawable(@NonNull Context context, @DrawableRes int resId) {
         return sManager.getDrawable(context, resId);
-    }
-
-    public static Drawable getVectorDrawable(@NonNull Resources res,
-            @DrawableRes int resId, @Nullable Resources.Theme theme) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return res.getDrawable(resId, theme);
-        } else {
-            return VectorDrawableCompat.create(res, resId, theme);
-        }
     }
 }

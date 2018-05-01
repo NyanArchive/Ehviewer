@@ -51,12 +51,8 @@ public class ShadowLinearLayout extends LinearLayout {
 
     private void init(Context context) {
         // TODO not only 2dp
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setOutlineProvider(ViewOutlineProvider.BOUNDS);
-            setElevation(LayoutUtils.dp2pix(context, 2));
-        } else {
-            setShadow((NinePatchDrawable) context.getResources().getDrawable(R.drawable.shadow_2dp)); // TODO draktheme
-        }
+        setOutlineProvider(ViewOutlineProvider.BOUNDS);
+        setElevation(LayoutUtils.dp2pix(context, 2));
     }
 
     private void setShadow(NinePatchDrawable shadow) {

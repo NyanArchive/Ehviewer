@@ -17,12 +17,15 @@
 package com.hippo.util;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Build;
 import android.view.View;
+import android.view.WindowManager;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
-class SystemUiHelperImplKK extends SystemUiHelperImplJB {
+class SystemUiHelperImplKK extends SystemUiHelper.SystemUiHelperImpl
+        implements View.OnSystemUiVisibilityChangeListener {
 
     SystemUiHelperImplKK(Activity activity, int level, int flags,
             SystemUiHelper.OnVisibilityChangeListener onVisibilityChangeListener) {
@@ -30,8 +33,17 @@ class SystemUiHelperImplKK extends SystemUiHelperImplJB {
     }
 
     @Override
-    protected int createHideFlags() {
-        int flag = super.createHideFlags();
+    void show() {
+
+    }
+
+    @Override
+    void hide() {
+
+    }
+
+    private int createHideFlags() {
+        int flag = createHideFlags();
 
         if (mLevel == SystemUiHelper.LEVEL_IMMERSIVE) {
             // If the client requested immersive mode, and we're on Android 4.4
@@ -47,4 +59,43 @@ class SystemUiHelperImplKK extends SystemUiHelperImplJB {
         return flag;
     }
 
+    @Override
+    public void onSystemUiVisibilityChange(int visibility) {
+        if ((visibility & createTestFlags()) != 0) {
+            onSystemUiHidden();
+        } else {
+            onSystemUiShown();
+        }
+    }
+
+    private void onSystemUiShown() {
+        ActionBar ab = mActivity.getActionBar();
+        if (ab != null) {
+            ab.show();
+        }
+
+        mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setIsShowing(true);
+    }
+
+    private void onSystemUiHidden() {
+        ActionBar ab = mActivity.getActionBar();
+        if (ab != null) {
+            ab.hide();
+        }
+
+        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setIsShowing(false);
+    }
+
+    private int createTestFlags() {
+        if (mLevel >= SystemUiHelper.LEVEL_LEAN_BACK) {
+            // Intentionally override test flags.
+            return View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+
+        return View.SYSTEM_UI_FLAG_LOW_PROFILE;
+    }
 }

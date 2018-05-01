@@ -25,7 +25,6 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -86,7 +85,6 @@ import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.unifile.UniFile;
-import com.hippo.util.ApiHelper;
 import com.hippo.util.DrawableManager;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.FabLayout;
@@ -1232,9 +1230,7 @@ public class DownloadsScene extends ToolbarScene
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list.get(index));
                 Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-                if (ApiHelper.SUPPORT_TRANSITION) {
-                    announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
-                }
+                announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
                 startScene(announcer);
             } else if (start == v) {
                 Intent intent = new Intent(activity, DownloadService.class);
@@ -1292,10 +1288,8 @@ public class DownloadsScene extends ToolbarScene
             bindForState(holder, info);
 
             // Update transition name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                long gid = info.gid;
-                holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
-            }
+            long gid = info.gid;
+            holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
         }
 
         @Override

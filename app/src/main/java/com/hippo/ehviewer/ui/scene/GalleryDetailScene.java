@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -90,7 +89,6 @@ import com.hippo.scene.SceneFragment;
 import com.hippo.scene.TransitionHelper;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
-import com.hippo.util.ApiHelper;
 import com.hippo.util.AppHelper;
 import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
@@ -968,9 +966,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private void setTransitionName() {
         long gid = getGid();
 
-        if (gid != -1 && ApiHelper.SUPPORT_TRANSITION && mThumb != null &&
-                mTitle != null && mUploader != null && mCategory != null &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (gid != -1 && mThumb != null &&
+                mTitle != null && mUploader != null && mCategory != null) {
             mThumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
             mTitle.setTransitionName(TransitionNameFactory.getTitleTransitionName(gid));
             mUploader.setTransitionName(TransitionNameFactory.getUploaderTransitionName(gid));
@@ -1354,7 +1351,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Override
     public void onBackPressed() {
-        if (ApiHelper.SUPPORT_TRANSITION && mViewTransition != null && mThumb != null &&
+        if (mViewTransition != null && mThumb != null &&
                 mViewTransition.getShownViewIndex() == 0 && mThumb.isShown()) {
             int[] location = new int[2];
             mThumb.getLocationInWindow(location);
@@ -1473,7 +1470,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         private final View mThumb;
 
-        public ExitTransaction(View thumb) {
+        private ExitTransaction(View thumb) {
             mThumb = thumb;
         }
 
@@ -1485,17 +1482,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 return false;
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                exit.setSharedElementReturnTransition(
-                        TransitionInflater.from(context).inflateTransition(R.transition.trans_move));
-                exit.setExitTransition(
-                        TransitionInflater.from(context).inflateTransition(android.R.transition.fade));
-                enter.setSharedElementEnterTransition(
-                        TransitionInflater.from(context).inflateTransition(R.transition.trans_move));
-                enter.setEnterTransition(
-                        TransitionInflater.from(context).inflateTransition(android.R.transition.fade));
-                transaction.addSharedElement(mThumb, mThumb.getTransitionName());
-            }
+            exit.setSharedElementReturnTransition(
+                    TransitionInflater.from(context).inflateTransition(R.transition.trans_move));
+            exit.setExitTransition(
+                    TransitionInflater.from(context).inflateTransition(android.R.transition.fade));
+            enter.setSharedElementEnterTransition(
+                    TransitionInflater.from(context).inflateTransition(R.transition.trans_move));
+            enter.setEnterTransition(
+                    TransitionInflater.from(context).inflateTransition(android.R.transition.fade));
+            transaction.addSharedElement(mThumb, mThumb.getTransitionName());
             return true;
         }
     }

@@ -16,10 +16,10 @@
 
 package com.hippo.ehviewer.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.util.AttributeSet;
@@ -29,7 +29,6 @@ import com.hippo.drawerlayout.DrawerLayoutChild;
 public class EhNavigationView extends NavigationView implements DrawerLayoutChild {
 
     private static final int SCRIM_COLOR = 0x44000000;
-    private static final boolean DRAW_SCRIM = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     private Paint mPaint;
     private int mFitPaddingTop;
 
@@ -49,16 +48,15 @@ public class EhNavigationView extends NavigationView implements DrawerLayoutChil
     }
 
     private void init() {
-        if (DRAW_SCRIM) {
-            setWillNotDraw(false);
-        }
+        setWillNotDraw(false);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void draw(@NonNull Canvas canvas) {
         super.draw(canvas);
 
-        if (DRAW_SCRIM && mFitPaddingTop > 0) {
+        if (mFitPaddingTop > 0) {
             if (null == mPaint) {
                 mPaint = new Paint();
                 mPaint.setColor(SCRIM_COLOR);
