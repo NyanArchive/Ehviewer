@@ -52,6 +52,9 @@ public class SeekBarPanel extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            performClick();
+        }
         if (mSeekBar == null) {
             return super.onTouchEvent(event);
         } else {
@@ -70,5 +73,10 @@ public class SeekBarPanel extends LinearLayout {
     protected boolean fitSystemWindows(Rect insets) {
         insets.top = 0;
         return super.fitSystemWindows(insets);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

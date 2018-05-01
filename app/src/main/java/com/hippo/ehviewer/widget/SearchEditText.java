@@ -73,6 +73,9 @@ public class SearchEditText extends AppCompatEditText {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            performClick();
+        }
         if (event.getAction() == MotionEvent.ACTION_UP && mListener != null) {
             mListener.onClick();
         }
@@ -82,5 +85,10 @@ public class SearchEditText extends AppCompatEditText {
     public interface SearchEditTextListener {
         void onClick();
         void onBackPressed();
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }
