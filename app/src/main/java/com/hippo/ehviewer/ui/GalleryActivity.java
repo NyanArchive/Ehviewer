@@ -189,23 +189,29 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        if (ACTION_DIR.equals(mAction)) {
-            if (mFilename != null) {
-                mGalleryProvider = new DirGalleryProvider(UniFile.fromFile(new File(mFilename)));
-            }
-        } else if (ACTION_ZIP.equals(mAction)) {
-            if (mFilename != null) {
-                mGalleryProvider = new ZipGalleryProvider(new File(mFilename));
-            }
-        } else if (ACTION_EH.equals(mAction)) {
-            if (mGalleryInfo != null) {
-                mGalleryProvider = new EhGalleryProvider(this, mGalleryInfo);
-            }
-        } else if (Intent.ACTION_VIEW.equals(mAction)) {
-            if (mUri != null) {
-                // Only support zip now
-                mGalleryProvider = new ZipGalleryProvider(new File(mUri.getPath()));
-            }
+        switch (mAction) {
+            case ACTION_DIR:
+                if (mFilename != null) {
+                    mGalleryProvider = new DirGalleryProvider(UniFile.fromFile(new File
+                            (mFilename)));
+                }
+                break;
+            case ACTION_ZIP:
+                if (mFilename != null) {
+                    mGalleryProvider = new ZipGalleryProvider(new File(mFilename));
+                }
+                break;
+            case ACTION_EH:
+                if (mGalleryInfo != null) {
+                    mGalleryProvider = new EhGalleryProvider(this, mGalleryInfo);
+                }
+                break;
+            case Intent.ACTION_VIEW:
+                if (mUri != null) {
+                    // Only support zip now
+                    mGalleryProvider = new ZipGalleryProvider(new File(mUri.getPath()));
+                }
+                break;
         }
     }
 
@@ -721,19 +727,19 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         @SuppressLint("InflateParams")
         public GalleryMenuHelper(Context context) {
             mView = LayoutInflater.from(context).inflate(R.layout.dialog_gallery_menu, null);
-            mScreenRotation = (Spinner) mView.findViewById(R.id.screen_rotation);
-            mReadingDirection = (Spinner) mView.findViewById(R.id.reading_direction);
-            mScaleMode = (Spinner) mView.findViewById(R.id.page_scaling);
-            mStartPosition = (Spinner) mView.findViewById(R.id.start_position);
-            mKeepScreenOn = (SwitchCompat) mView.findViewById(R.id.keep_screen_on);
-            mShowClock = (SwitchCompat) mView.findViewById(R.id.show_clock);
-            mShowProgress = (SwitchCompat) mView.findViewById(R.id.show_progress);
-            mShowBattery = (SwitchCompat) mView.findViewById(R.id.show_battery);
-            mShowPageInterval = (SwitchCompat) mView.findViewById(R.id.show_page_interval);
-            mVolumePage = (SwitchCompat) mView.findViewById(R.id.volume_page);
-            mReadingFullscreen = (SwitchCompat) mView.findViewById(R.id.reading_fullscreen);
-            mCustomScreenLightness = (SwitchCompat) mView.findViewById(R.id.custom_screen_lightness);
-            mScreenLightness = (SeekBar) mView.findViewById(R.id.screen_lightness);
+            mScreenRotation = mView.findViewById(R.id.screen_rotation);
+            mReadingDirection = mView.findViewById(R.id.reading_direction);
+            mScaleMode = mView.findViewById(R.id.page_scaling);
+            mStartPosition = mView.findViewById(R.id.start_position);
+            mKeepScreenOn = mView.findViewById(R.id.keep_screen_on);
+            mShowClock = mView.findViewById(R.id.show_clock);
+            mShowProgress = mView.findViewById(R.id.show_progress);
+            mShowBattery = mView.findViewById(R.id.show_battery);
+            mShowPageInterval = mView.findViewById(R.id.show_page_interval);
+            mVolumePage = mView.findViewById(R.id.volume_page);
+            mReadingFullscreen = mView.findViewById(R.id.reading_fullscreen);
+            mCustomScreenLightness = mView.findViewById(R.id.custom_screen_lightness);
+            mScreenLightness = mView.findViewById(R.id.screen_lightness);
 
             mScreenRotation.setSelection(Settings.getScreenRotation());
             mReadingDirection.setSelection(Settings.getReadingDirection());
@@ -750,12 +756,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mScreenLightness.setProgress(Settings.getScreenLightness());
             mScreenLightness.setEnabled(Settings.getCustomScreenLightness());
 
-            mCustomScreenLightness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mScreenLightness.setEnabled(isChecked);
-                }
-            });
+            mCustomScreenLightness.setOnCheckedChangeListener((buttonView, isChecked) -> mScreenLightness.setEnabled(isChecked));
         }
 
         public View getView() {
@@ -977,27 +978,24 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     private void pageDialogListener(AlertDialog.Builder builder, CharSequence[] items, int page){
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (mGalleryProvider == null) {
-                    return;
-                }
+        builder.setItems(items, (dialog, which) -> {
+            if (mGalleryProvider == null) {
+                return;
+            }
 
-                switch (which) {
-                    case 0: // Refresh
-                        mGalleryProvider.forceRequest(page);
-                        break;
-                    case 1: // Share
-                        shareImage(page);
-                        break;
-                    case 2: // Save
-                        saveImage(page);
-                        break;
-                    case 3: // Save to
-                        saveImageTo(page);
-                        break;
-                }
+            switch (which) {
+                case 0: // Refresh
+                    mGalleryProvider.forceRequest(page);
+                    break;
+                case 1: // Share
+                    shareImage(page);
+                    break;
+                case 2: // Save
+                    saveImage(page);
+                    break;
+                case 3: // Save to
+                    saveImageTo(page);
+                    break;
             }
         });
     }

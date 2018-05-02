@@ -107,14 +107,17 @@ public class SpiderInfo {
             // Get version
             String line = IOUtils.readAsciiLine(is);
             int version = getVersion(line);
-            if (version == VERSION) {
-                // Read next line
-                line = IOUtils.readAsciiLine(is);
-            } else if (version == 1) {
-                // pass
-            } else {
-                // Invalid version
-                return null;
+            switch (version) {
+                case VERSION:
+                    // Read next line
+                    line = IOUtils.readAsciiLine(is);
+                    break;
+                case 1:
+                    // pass
+                    break;
+                default:
+                    // Invalid version
+                    return null;
             }
             // Start page
             spiderInfo.startPage = getStartPage(line);
@@ -130,6 +133,7 @@ public class SpiderInfo {
             line = IOUtils.readAsciiLine(is);
             if (version == 1) {
                 // Skip it
+                Log.i(TAG, "version == 1");
             } else {
                 spiderInfo.previewPerPage = Integer.parseInt(line);
             }

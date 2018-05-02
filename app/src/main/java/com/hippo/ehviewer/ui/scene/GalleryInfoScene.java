@@ -149,7 +149,6 @@ public final class GalleryInfoScene extends ToolbarScene implements EasyRecycler
     }
 
     @SuppressWarnings("deprecation")
-    @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -175,7 +174,7 @@ public final class GalleryInfoScene extends ToolbarScene implements EasyRecycler
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_info);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -219,8 +218,8 @@ public final class GalleryInfoScene extends ToolbarScene implements EasyRecycler
         public InfoHolder(View itemView) {
             super(itemView);
 
-            key = (TextView) itemView.findViewById(R.id.key);
-            value = (TextView) itemView.findViewById(R.id.value);
+            key = itemView.findViewById(R.id.key);
+            value = itemView.findViewById(R.id.value);
         }
     }
 

@@ -61,6 +61,9 @@ public class ReversibleSeekBar extends AppCompatSeekBar {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            performClick();
+        }
         boolean reverse = mReverse;
         float x = 0.0f, y = 0.0f;
         if (reverse) {
@@ -73,5 +76,9 @@ public class ReversibleSeekBar extends AppCompatSeekBar {
             event.setLocation(x, y);
         }
         return result;
+    }
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

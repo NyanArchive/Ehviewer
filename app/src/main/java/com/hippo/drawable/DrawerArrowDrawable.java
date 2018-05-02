@@ -26,6 +26,7 @@ import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.MathUtils;
@@ -97,7 +98,7 @@ public class DrawerArrowDrawable extends Drawable {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NonNull Canvas canvas) {
         Rect bounds = getBounds();
         // Interpolated widths of arrow bars
         final float arrowSize = MathUtils.lerp(mBarSize, mTopBottomArrowSize, mProgress);

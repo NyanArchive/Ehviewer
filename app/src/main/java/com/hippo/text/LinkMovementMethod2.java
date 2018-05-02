@@ -66,38 +66,26 @@ public class LinkMovementMethod2 extends ScrollingMovementMethod {
 
     @Override
     protected boolean up(TextView widget, Spannable buffer) {
-        if (action(UP, widget, buffer)) {
-            return true;
-        }
+        return action(UP, widget, buffer) || super.up(widget, buffer);
 
-        return super.up(widget, buffer);
     }
 
     @Override
     protected boolean down(TextView widget, Spannable buffer) {
-        if (action(DOWN, widget, buffer)) {
-            return true;
-        }
+        return action(DOWN, widget, buffer) || super.down(widget, buffer);
 
-        return super.down(widget, buffer);
     }
 
     @Override
     protected boolean left(TextView widget, Spannable buffer) {
-        if (action(UP, widget, buffer)) {
-            return true;
-        }
+        return action(UP, widget, buffer) || super.left(widget, buffer);
 
-        return super.left(widget, buffer);
     }
 
     @Override
     protected boolean right(TextView widget, Spannable buffer) {
-        if (action(DOWN, widget, buffer)) {
-            return true;
-        }
+        return action(DOWN, widget, buffer) || super.right(widget, buffer);
 
-        return super.right(widget, buffer);
     }
 
     private boolean action(int what, TextView widget, Spannable buffer) {
@@ -153,12 +141,12 @@ public class LinkMovementMethod2 extends ScrollingMovementMethod {
                 beststart = -1;
                 bestend = -1;
 
-                for (int i = 0; i < candidates.length; i++) {
-                    int end = buffer.getSpanEnd(candidates[i]);
+                for (ClickableSpan candidate : candidates) {
+                    int end = buffer.getSpanEnd(candidate);
 
                     if (end < selEnd || selStart == selEnd) {
                         if (end > bestend) {
-                            beststart = buffer.getSpanStart(candidates[i]);
+                            beststart = buffer.getSpanStart(candidate);
                             bestend = end;
                         }
                     }
@@ -175,13 +163,13 @@ public class LinkMovementMethod2 extends ScrollingMovementMethod {
                 beststart = Integer.MAX_VALUE;
                 bestend = Integer.MAX_VALUE;
 
-                for (int i = 0; i < candidates.length; i++) {
-                    int start = buffer.getSpanStart(candidates[i]);
+                for (ClickableSpan candidate : candidates) {
+                    int start = buffer.getSpanStart(candidate);
 
                     if (start > selStart || selStart == selEnd) {
                         if (start < beststart) {
                             beststart = start;
-                            bestend = buffer.getSpanEnd(candidates[i]);
+                            bestend = buffer.getSpanEnd(candidate);
                         }
                     }
                 }
@@ -227,7 +215,7 @@ public class LinkMovementMethod2 extends ScrollingMovementMethod {
                     } else {
                         span.onClick(widget);
                     }
-                } else if (action == MotionEvent.ACTION_DOWN) {
+                } else {
                     Selection.setSelection(buffer,
                             buffer.getSpanStart(link[0]),
                             buffer.getSpanEnd(link[0]));

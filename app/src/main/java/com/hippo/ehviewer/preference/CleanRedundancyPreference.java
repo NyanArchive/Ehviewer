@@ -62,8 +62,8 @@ public class CleanRedundancyPreference extends TaskPreference {
         // True for cleared
         private boolean clearFile(UniFile file) {
             String name = file.getName();
-            int index = name.indexOf('-');
-            if (index >= 0) {
+            int index;
+            if (name != null && (index = name.indexOf('-')) >= 0) {
                 name = name.substring(0, index);
             }
             long gid = NumberUtils.parseLongSafely(name, -1L);

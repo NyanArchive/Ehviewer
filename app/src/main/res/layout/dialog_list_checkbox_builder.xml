@@ -43,6 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="?android:attr/dialogPreferredPadding"
         android:layout_marginRight="?android:attr/dialogPreferredPadding"
-        android:layout_marginBottom="@dimen/abc_dialog_padding_top_material"/>
+        android:layout_marginBottom="@dimen/dialog_padding_top_material"/>
 
 </LinearLayout>

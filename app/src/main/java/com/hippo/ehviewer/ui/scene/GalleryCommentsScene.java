@@ -257,7 +257,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_comments);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -319,8 +319,9 @@ public final class GalleryCommentsScene extends ToolbarScene
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
         rv.setAdapter(new RecyclerView.Adapter<InfoHolder>() {
+            @NonNull
             @Override
-            public InfoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public InfoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 return new InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false));
             }
 
@@ -375,31 +376,28 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         new AlertDialog.Builder(context)
-                .setItems(menu.toArray(new String[menu.size()]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which < 0 || which >= menuId.size()) {
-                           return;
-                        }
-                        int id = menuId.get(which);
-                        switch (id) {
-                            case R.id.copy:
-                                ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                                if (cmb != null){
-                                    cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
-                                    showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
-                                }
-                                break;
-                            case R.id.vote_up:
-                                voteComment(comment.id, 1);
-                                break;
-                            case R.id.vote_down:
-                                voteComment(comment.id, -1);
-                                break;
-                            case R.id.check_vote_status:
-                                showVoteStatusDialog(context, comment.voteState);
-                                break;
-                        }
+                .setItems(menu.toArray(new String[menu.size()]), (dialog, which) -> {
+                    if (which < 0 || which >= menuId.size()) {
+                       return;
+                    }
+                    int id = menuId.get(which);
+                    switch (id) {
+                        case R.id.copy:
+                            ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (cmb != null){
+                                cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
+                                showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                            }
+                            break;
+                        case R.id.vote_up:
+                            voteComment(comment.id, 1);
+                            break;
+                        case R.id.vote_down:
+                            voteComment(comment.id, -1);
+                            break;
+                        case R.id.check_vote_status:
+                            showVoteStatusDialog(context, comment.voteState);
+                            break;
                     }
                 }).show();
     }
@@ -608,9 +606,9 @@ public final class GalleryCommentsScene extends ToolbarScene
 
         public CommentHolder(View itemView) {
             super(itemView);
-            user = (TextView) itemView.findViewById(R.id.user);
-            time = (TextView) itemView.findViewById(R.id.time);
-            comment = (LinkifyTextView) itemView.findViewById(R.id.comment);
+            user = itemView.findViewById(R.id.user);
+            time = itemView.findViewById(R.id.time);
+            comment = itemView.findViewById(R.id.comment);
         }
     }
 

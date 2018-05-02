@@ -246,18 +246,15 @@ public class ListPreference extends DialogPreference {
 
         mClickedDialogEntryIndex = getValueIndex();
         builder.setSingleChoiceItems(mEntries, mClickedDialogEntryIndex,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mClickedDialogEntryIndex = which;
+                (dialog, which) -> {
+                    mClickedDialogEntryIndex = which;
 
-                        /*
-                         * Clicking on an item simulates the positive button
-                         * click, and dismisses the dialog.
-                         */
-                        ListPreference.this.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
-                        dialog.dismiss();
-                    }
+                    /*
+                     * Clicking on an item simulates the positive button
+                     * click, and dismisses the dialog.
+                     */
+                    ListPreference.this.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
+                    dialog.dismiss();
                 });
     }
 

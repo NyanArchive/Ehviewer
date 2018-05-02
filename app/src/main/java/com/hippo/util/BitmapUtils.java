@@ -16,6 +16,7 @@
 
 package com.hippo.util;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,23 +27,25 @@ import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.yorozuya.MathUtils;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public final class BitmapUtils {
     private BitmapUtils() {}
 
-    public static Context sContext;
+    @SuppressLint("StaticFieldLeak")
+    private static Context sContext;
 
     public static void initialize(Context context) {
         sContext = context.getApplicationContext();
     }
 
-    public static long availableMemory() {
+    private static long availableMemory() {
         final Runtime runtime = Runtime.getRuntime();
         final long used = runtime.totalMemory() - runtime.freeMemory();
 
         final ActivityManager activityManager = (ActivityManager) sContext.
                 getSystemService(Context.ACTIVITY_SERVICE);
-        final long total = activityManager.getMemoryClass() * 1024 * 1024;
+        final long total = Objects.requireNonNull(activityManager).getMemoryClass() * 1024 * 1024;
 
         return total - used;
     }

@@ -22,7 +22,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -78,7 +77,7 @@ public class EhDB {
 
     private static class DBOpenHelper extends DaoMaster.OpenHelper {
 
-        public DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory) {
+        private DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory) {
             super(context, name, factory);
         }
 
@@ -651,7 +650,9 @@ public class EhDB {
             IOUtils.closeQuietly(os);
         }
         // Delete failed file
-        file.delete();
+        if (!file.delete()) {
+            Log.i(TAG, "Delete file failed: " + file);
+        }
         return false;
     }
 
@@ -777,12 +778,13 @@ public class EhDB {
         try {
             File file = new File(context.getCacheDir().getPath()+"/import.db");
 
-            InputStream is = null;
-            OutputStream os = null;
             ContentResolver resolver = context.getContentResolver();
+            InputStream is = resolver.openInputStream(uri);
+            if (is == null) {
+                return null;
+            }
+            OutputStream os = new FileOutputStream(file);
             try {
-                is = resolver.openInputStream(uri);
-                os = new FileOutputStream(file);
                 IOUtils.copy(is, os);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -860,7 +862,9 @@ public class EhDB {
                 }
             }
 
-            file.delete();
+            if (!file.delete()) {
+                Log.i(TAG, "Delete file failed: " + file);
+            }
 
             return null;
         } catch (Exception e) {

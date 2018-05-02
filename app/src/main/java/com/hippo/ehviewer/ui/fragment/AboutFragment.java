@@ -60,22 +60,30 @@ public class AboutFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
-        if (KEY_AUTHOR.equals(key)) {
-            AppHelper.sendEmail(getActivity(), EhApplication.getDeveloperEmail(),
-                    "About EhViewer", null);
-        } else if (KEY_DONATE.equals(key)) {
-            ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-            if (cmb != null){
-                cmb.setPrimaryClip(ClipData.newPlainText(null, "seven332$163.com".replace('$', '@')));
-                Toast.makeText(getActivity(), R.string.settings_about_donate_toast, Toast.LENGTH_SHORT).show();
-            }
+        switch (key) {
+            case KEY_AUTHOR:
+                AppHelper.sendEmail(getActivity(), EhApplication.getDeveloperEmail(),
+                        "About EhViewer", null);
+                break;
+            case KEY_DONATE:
+                ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context
+                        .CLIPBOARD_SERVICE);
+                if (cmb != null) {
+                    cmb.setPrimaryClip(ClipData.newPlainText(null, "seven332$163.com".replace
+                            ('$', '@')));
+                    Toast.makeText(getActivity(), R.string.settings_about_donate_toast, Toast
+                            .LENGTH_SHORT).show();
+                }
 
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.settings_about_donate)
-                    .setMessage(getString(R.string.settings_about_donate_message).replace('$', '@'))
-                    .show();
-        } else if (KEY_CHECK_FOR_UPDATES.equals(key)) {
-            CommonOperations.checkUpdate(getActivity(), true);
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.settings_about_donate)
+                        .setMessage(getString(R.string.settings_about_donate_message).replace
+                                ('$', '@'))
+                        .show();
+                break;
+            case KEY_CHECK_FOR_UPDATES:
+                CommonOperations.checkUpdate(getActivity(), true);
+                break;
         }
         return true;
     }

@@ -24,8 +24,12 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 public class RoundSideRectDrawable extends Drawable {
+
+    private static final String TAG = RoundSideRectDrawable.class.getSimpleName();
 
     private final Paint mPaint;
     private final Path mPath;
@@ -59,11 +63,12 @@ public class RoundSideRectDrawable extends Drawable {
             path.addCircle(bounds.centerX(), bounds.centerY(), width / 2, Path.Direction.CW);
         } else {
             // TODO
+            Log.i(TAG, "width < height");
         }
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NonNull Canvas canvas) {
         canvas.drawPath(mPath, mPaint);
     }
 

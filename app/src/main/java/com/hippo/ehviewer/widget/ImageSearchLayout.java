@@ -204,14 +204,14 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         /**
          * Constructor called from {@link ImageSearchLayout#onSaveInstanceState()}
          */
-        protected SavedState(Parcelable superState) {
+        private SavedState(Parcelable superState) {
             super(superState);
         }
 
         /**
          * Constructor called from {@link #CREATOR}
          */
-        protected SavedState(Parcel source) {
+        private SavedState(Parcel source) {
             super(source);
             imagePath = source.readString();
         }

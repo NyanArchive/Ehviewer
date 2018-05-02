@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
@@ -346,7 +347,7 @@ public class FileProvider extends ContentProvider {
     private static final File DEVICE_ROOT = new File("/");
 
     // @GuardedBy("sCache")
-    private static HashMap<String, PathStrategy> sCache = new HashMap<String, PathStrategy>();
+    private static final HashMap<String, PathStrategy> sCache = new HashMap<>();
 
     private PathStrategy mStrategy;
 
@@ -378,7 +379,11 @@ public class FileProvider extends ContentProvider {
             throw new SecurityException("Provider must grant uri permissions");
         }
 
-        mStrategy = getPathStrategy(context, info.authority);
+        try {
+            mStrategy = getPathStrategy(context, info.authority);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -401,7 +406,8 @@ public class FileProvider extends ContentProvider {
      * @throws IllegalArgumentException When the given {@link File} is outside
      * the paths supported by the provider.
      */
-    public static Uri getUriForFile(Context context, String authority, File file) {
+    public static Uri getUriForFile(Context context, String authority, File file) throws
+            XmlPullParserException {
         final PathStrategy strategy = getPathStrategy(context, authority);
         return strategy.getUriForFile(file);
     }
@@ -436,8 +442,8 @@ public class FileProvider extends ContentProvider {
      *
      */
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
         // ContentProvider has already checked granted permissions
         final File file = mStrategy.getFileForUri(uri);
 
@@ -449,15 +455,19 @@ public class FileProvider extends ContentProvider {
         Object[] values = new Object[projection.length];
         int i = 0;
         for (String col : projection) {
-            if (MediaStore.MediaColumns.DISPLAY_NAME.equals(col)) {
-                cols[i] = MediaStore.MediaColumns.DISPLAY_NAME;
-                values[i++] = file.getName();
-            } else if (MediaStore.MediaColumns.SIZE.equals(col)) {
-                cols[i] = MediaStore.MediaColumns.SIZE;
-                values[i++] = file.length();
-            } else if (MediaStore.MediaColumns.DATA.equals(col)) {
-                cols[i] = MediaStore.MediaColumns.DATA;
-                values[i++] = file.getPath();
+            switch (col) {
+                case MediaStore.MediaColumns.DISPLAY_NAME:
+                    cols[i] = MediaStore.MediaColumns.DISPLAY_NAME;
+                    values[i++] = file.getName();
+                    break;
+                case MediaStore.MediaColumns.SIZE:
+                    cols[i] = MediaStore.MediaColumns.SIZE;
+                    values[i++] = file.length();
+                    break;
+                case MediaStore.MediaColumns.DATA:
+                    cols[i] = MediaStore.MediaColumns.DATA;
+                    values[i++] = file.getPath();
+                    break;
             }
         }
 
@@ -479,7 +489,7 @@ public class FileProvider extends ContentProvider {
      * extension; otherwise <code>application/octet-stream</code>.
      */
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         // ContentProvider has already checked granted permissions
         final File file = mStrategy.getFileForUri(uri);
 
@@ -500,7 +510,7 @@ public class FileProvider extends ContentProvider {
      * subclass FileProvider if you want to provide different functionality.
      */
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         throw new UnsupportedOperationException("No external inserts");
     }
 
@@ -509,7 +519,7 @@ public class FileProvider extends ContentProvider {
      * subclass FileProvider if you want to provide different functionality.
      */
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         throw new UnsupportedOperationException("No external updates");
     }
 
@@ -525,7 +535,7 @@ public class FileProvider extends ContentProvider {
      * @return 1 if the delete succeeds; otherwise, 0.
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         // ContentProvider has already checked granted permissions
         final File file = mStrategy.getFileForUri(uri);
         return file.delete() ? 1 : 0;
@@ -547,7 +557,7 @@ public class FileProvider extends ContentProvider {
      * @return A new {@link ParcelFileDescriptor} with which you can access the file.
      */
     @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+    public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode) throws FileNotFoundException {
         // ContentProvider has already checked granted permissions
         final File file = mStrategy.getFileForUri(uri);
         final int fileMode = modeToMode(mode);
@@ -558,7 +568,7 @@ public class FileProvider extends ContentProvider {
      * Return {@link PathStrategy} for given authority, either by parsing or
      * returning from cache.
      */
-    private static PathStrategy getPathStrategy(Context context, String authority) {
+    private static PathStrategy getPathStrategy(Context context, String authority) throws XmlPullParserException {
         PathStrategy strat;
         synchronized (sCache) {
             strat = sCache.get(authority);
@@ -566,9 +576,6 @@ public class FileProvider extends ContentProvider {
                 try {
                     strat = parsePathStrategy(context, authority);
                 } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Failed to parse " + META_DATA_FILE_PROVIDER_PATHS + " meta-data", e);
-                } catch (XmlPullParserException e) {
                     throw new IllegalArgumentException(
                             "Failed to parse " + META_DATA_FILE_PROVIDER_PATHS + " meta-data", e);
                 }
@@ -606,24 +613,32 @@ public class FileProvider extends ContentProvider {
                 String path = in.getAttributeValue(null, ATTR_PATH);
 
                 File target = null;
-                if (TAG_ROOT_PATH.equals(tag)) {
-                    target = DEVICE_ROOT;
-                } else if (TAG_FILES_PATH.equals(tag)) {
-                    target = context.getFilesDir();
-                } else if (TAG_CACHE_PATH.equals(tag)) {
-                    target = context.getCacheDir();
-                } else if (TAG_EXTERNAL.equals(tag)) {
-                    target = Environment.getExternalStorageDirectory();
-                } else if (TAG_EXTERNAL_FILES.equals(tag)) {
-                    File[] externalFilesDirs = ContextCompat.getExternalFilesDirs(context, null);
-                    if (externalFilesDirs.length > 0) {
-                        target = externalFilesDirs[0];
-                    }
-                } else if (TAG_EXTERNAL_CACHE.equals(tag)) {
-                    File[] externalCacheDirs = ContextCompat.getExternalCacheDirs(context);
-                    if (externalCacheDirs.length > 0) {
-                        target = externalCacheDirs[0];
-                    }
+                switch (tag) {
+                    case TAG_ROOT_PATH:
+                        target = DEVICE_ROOT;
+                        break;
+                    case TAG_FILES_PATH:
+                        target = context.getFilesDir();
+                        break;
+                    case TAG_CACHE_PATH:
+                        target = context.getCacheDir();
+                        break;
+                    case TAG_EXTERNAL:
+                        target = Environment.getExternalStorageDirectory();
+                        break;
+                    case TAG_EXTERNAL_FILES:
+                        File[] externalFilesDirs = ContextCompat.getExternalFilesDirs(context,
+                                null);
+                        if (externalFilesDirs.length > 0) {
+                            target = externalFilesDirs[0];
+                        }
+                        break;
+                    case TAG_EXTERNAL_CACHE:
+                        File[] externalCacheDirs = ContextCompat.getExternalCacheDirs(context);
+                        if (externalCacheDirs.length > 0) {
+                            target = externalCacheDirs[0];
+                        }
+                        break;
                 }
 
                 if (target != null) {
@@ -652,12 +667,12 @@ public class FileProvider extends ContentProvider {
         /**
          * Return a {@link Uri} that represents the given {@link File}.
          */
-        public Uri getUriForFile(File file);
+        Uri getUriForFile(File file);
 
         /**
          * Return a {@link File} that represents the given {@link Uri}.
          */
-        public File getFileForUri(Uri uri);
+        File getFileForUri(Uri uri);
     }
 
     /**
@@ -672,7 +687,7 @@ public class FileProvider extends ContentProvider {
      */
     static class SimplePathStrategy implements PathStrategy {
         private final String mAuthority;
-        private final HashMap<String, File> mRoots = new HashMap<String, File>();
+        private final HashMap<String, File> mRoots = new HashMap<>();
 
         public SimplePathStrategy(String authority) {
             mAuthority = authority;
@@ -769,25 +784,32 @@ public class FileProvider extends ContentProvider {
      */
     private static int modeToMode(String mode) {
         int modeBits;
-        if ("r".equals(mode)) {
-            modeBits = ParcelFileDescriptor.MODE_READ_ONLY;
-        } else if ("w".equals(mode) || "wt".equals(mode)) {
-            modeBits = ParcelFileDescriptor.MODE_WRITE_ONLY
-                    | ParcelFileDescriptor.MODE_CREATE
-                    | ParcelFileDescriptor.MODE_TRUNCATE;
-        } else if ("wa".equals(mode)) {
-            modeBits = ParcelFileDescriptor.MODE_WRITE_ONLY
-                    | ParcelFileDescriptor.MODE_CREATE
-                    | ParcelFileDescriptor.MODE_APPEND;
-        } else if ("rw".equals(mode)) {
-            modeBits = ParcelFileDescriptor.MODE_READ_WRITE
-                    | ParcelFileDescriptor.MODE_CREATE;
-        } else if ("rwt".equals(mode)) {
-            modeBits = ParcelFileDescriptor.MODE_READ_WRITE
-                    | ParcelFileDescriptor.MODE_CREATE
-                    | ParcelFileDescriptor.MODE_TRUNCATE;
-        } else {
-            throw new IllegalArgumentException("Invalid mode: " + mode);
+        switch (mode) {
+            case "r":
+                modeBits = ParcelFileDescriptor.MODE_READ_ONLY;
+                break;
+            case "w":
+            case "wt":
+                modeBits = ParcelFileDescriptor.MODE_WRITE_ONLY
+                        | ParcelFileDescriptor.MODE_CREATE
+                        | ParcelFileDescriptor.MODE_TRUNCATE;
+                break;
+            case "wa":
+                modeBits = ParcelFileDescriptor.MODE_WRITE_ONLY
+                        | ParcelFileDescriptor.MODE_CREATE
+                        | ParcelFileDescriptor.MODE_APPEND;
+                break;
+            case "rw":
+                modeBits = ParcelFileDescriptor.MODE_READ_WRITE
+                        | ParcelFileDescriptor.MODE_CREATE;
+                break;
+            case "rwt":
+                modeBits = ParcelFileDescriptor.MODE_READ_WRITE
+                        | ParcelFileDescriptor.MODE_CREATE
+                        | ParcelFileDescriptor.MODE_TRUNCATE;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid mode: " + mode);
         }
         return modeBits;
     }

@@ -138,7 +138,7 @@ public final class SearchDatabase {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
-        public DatabaseHelper(Context context) {
+        private DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, 1);
         }
 

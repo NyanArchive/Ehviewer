@@ -274,8 +274,7 @@ public class LockPatternView extends View {
         mErrorColor = getResources().getColor(R.color.lock_pattern_view_error_color);
         mSuccessColor = getResources().getColor(R.color.lock_pattern_view_success_color);
 
-        int pathColor = mRegularColor;//a.getColor(R.styleable.LockPatternView_pathColor, mRegularColor);
-        mPathPaint.setColor(pathColor);
+        mPathPaint.setColor(mRegularColor);
 
         mPathPaint.setStyle(Paint.Style.STROKE);
         mPathPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -483,7 +482,7 @@ public class LockPatternView extends View {
 
     private int resolveMeasured(int measureSpec, int desired)
     {
-        int result = 0;
+        int result;
         int specSize = MeasureSpec.getSize(measureSpec);
         switch (MeasureSpec.getMode(measureSpec)) {
             case MeasureSpec.UNSPECIFIED:
@@ -581,13 +580,8 @@ public class LockPatternView extends View {
     private void startCellActivatedAnimation(Cell cell) {
         final CellState cellState = mCellStates[cell.row][cell.column];
         startSizeAnimation(mDotSize, mDotSizeActivated, 96, mLinearOutSlowInInterpolator,
-                cellState, new Runnable() {
-            @Override
-            public void run() {
-                startSizeAnimation(mDotSizeActivated, mDotSize, 192, mFastOutSlowInInterpolator,
-                        cellState, null);
-            }
-        });
+                cellState, () -> startSizeAnimation(mDotSizeActivated, mDotSize, 192, mFastOutSlowInInterpolator,
+                        cellState, null));
         startLineEndAnimation(cellState, mInProgressX, mInProgressY,
                 getCenterXForColumn(cell.column), getCenterYForRow(cell.row));
     }
@@ -595,14 +589,11 @@ public class LockPatternView extends View {
     private void startLineEndAnimation(final CellState state,
             final float startX, final float startY, final float targetX, final float targetY) {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float t = (float) animation.getAnimatedValue();
-                state.lineEndX = (1 - t) * startX + t * targetX;
-                state.lineEndY = (1 - t) * startY + t * targetY;
-                invalidate();
-            }
+        valueAnimator.addUpdateListener(animation -> {
+            float t = (float) animation.getAnimatedValue();
+            state.lineEndX = (1 - t) * startX + t * targetX;
+            state.lineEndY = (1 - t) * startY + t * targetY;
+            invalidate();
         });
         valueAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -619,12 +610,9 @@ public class LockPatternView extends View {
     private void startSizeAnimation(float start, float end, long duration, Interpolator interpolator,
             final CellState state, final Runnable endRunnable) {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(start, end);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                state.size = (float) animation.getAnimatedValue();
-                invalidate();
-            }
+        valueAnimator.addUpdateListener(animation -> {
+            state.size = (float) animation.getAnimatedValue();
+            invalidate();
         });
         if (endRunnable != null) {
             valueAnimator.addListener(new AnimatorListenerAdapter() {
@@ -702,7 +690,7 @@ public class LockPatternView extends View {
     public boolean onHoverEvent(@NonNull MotionEvent event) {
         AccessibilityManager accessibilityManager =
                 (AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
-        if (accessibilityManager.isTouchExplorationEnabled()) {
+        if (accessibilityManager != null && accessibilityManager.isTouchExplorationEnabled()) {
             final int action = event.getAction();
             switch (action) {
                 case MotionEvent.ACTION_HOVER_ENTER:
@@ -729,6 +717,7 @@ public class LockPatternView extends View {
 
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                performClick();
                 handleActionDown(event);
                 return true;
             case MotionEvent.ACTION_UP:
@@ -752,6 +741,11 @@ public class LockPatternView extends View {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     private void handleActionMove(MotionEvent event) {
@@ -778,8 +772,7 @@ public class LockPatternView extends View {
             }
 
             if (mPatternInProgress && patternSize > 0) {
-                final ArrayList<Cell> pattern = mPattern;
-                final Cell lastCell = pattern.get(patternSize - 1);
+                final Cell lastCell = mPattern.get(patternSize - 1);
                 float lastCellCenterX = getCenterXForColumn(lastCell.column);
                 float lastCellCenterY = getCenterYForRow(lastCell.row);
 

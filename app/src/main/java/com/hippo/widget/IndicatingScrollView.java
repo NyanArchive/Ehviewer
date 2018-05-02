@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -51,6 +52,7 @@ public class IndicatingScrollView extends ScrollView {
     }
 
     private void init(Context context, AttributeSet attrs) {
+        @SuppressLint("CustomViewStyleable")
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Indicating);
         mIndicatorHeight = a.getDimensionPixelOffset(R.styleable.Indicating_indicatorHeight, 1);
         mPaint.setColor(a.getColor(R.styleable.Indicating_indicatorColor, Color.BLACK));

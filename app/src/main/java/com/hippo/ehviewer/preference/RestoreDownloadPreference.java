@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.preference;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Parcel;
@@ -120,6 +121,9 @@ public class RestoreDownloadPreference extends TaskPreference {
             List<RestoreItem> restoreItemList = new ArrayList<>();
 
             UniFile[] files = dir.listFiles();
+            if (files == null) {
+                return null;
+            }
             for (UniFile file: files) {
                 RestoreItem restoreItem = getRestoreItem(file);
                 if (null != restoreItem) {
@@ -132,13 +136,14 @@ public class RestoreDownloadPreference extends TaskPreference {
             }
 
             try {
-                return EhEngine.fillGalleryListByApi(null, mHttpClient, new ArrayList<GalleryInfo>(restoreItemList));
+                return EhEngine.fillGalleryListByApi(null, mHttpClient, new ArrayList<>(restoreItemList));
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
         }
 
+        @SuppressLint("StringFormatMatches")
         @Override
         @SuppressWarnings("unchecked")
         protected void onPostExecute(Object o) {

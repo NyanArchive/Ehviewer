@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -82,13 +83,13 @@ public class ContentLayout extends FrameLayout {
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_content_layout, this);
 
-        mProgressView = (ProgressView) findViewById(R.id.progress);
-        mTipView = (TextView) findViewById(R.id.tip);
-        mContentView = (ViewGroup) findViewById(R.id.content_view);
+        mProgressView = findViewById(R.id.progress);
+        mTipView = findViewById(R.id.tip);
+        mContentView = findViewById(R.id.content_view);
 
-        mRefreshLayout = (RefreshLayout) mContentView.findViewById(R.id.refresh_layout);
-        mFastScroller = (FastScroller) mContentView.findViewById(R.id.fast_scroller);
-        mRecyclerView = (EasyRecyclerView) mRefreshLayout.findViewById(R.id.recycler_view);
+        mRefreshLayout = mContentView.findViewById(R.id.refresh_layout);
+        mFastScroller = mContentView.findViewById(R.id.fast_scroller);
+        mRecyclerView = mRefreshLayout.findViewById(R.id.recycler_view);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
@@ -287,12 +288,7 @@ public class ContentLayout extends FrameLayout {
         };
 
         private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener =
-                new LayoutManagerUtils.OnScrollToPositionListener() {
-                    @Override
-                    public void onScrollToPosition(int position) {
-                        ContentHelper.this.onScrollToPosition(position);
-                    }
-                };
+                ContentHelper.this::onScrollToPosition;
 
         private void init(ContentLayout contentLayout) {
             mNextPageScrollSize = LayoutUtils.dp2pix(contentLayout.getContext(), 48);
@@ -314,12 +310,7 @@ public class ContentLayout extends FrameLayout {
             mRecyclerView.addOnScrollListener(mOnScrollListener);
             mRefreshLayout.setOnRefreshListener(mOnRefreshListener);
 
-            mTipView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    refresh();
-                }
-            });
+            mTipView.setOnClickListener(v -> refresh());
         }
 
         /**
@@ -359,7 +350,7 @@ public class ContentLayout extends FrameLayout {
             mEmptyString = str;
         }
 
-        public List<E> getData() {
+        public List<?> getData() {
             return mData;
         }
 
@@ -431,7 +422,7 @@ public class ContentLayout extends FrameLayout {
                             mData.clear();
                             notifyDataSetChanged();
 
-                            if (true || mEndPage >= mPages) { // Not found
+                            if (mEndPage >= mPages) { // Not found
                                 // Ui change, show empty string
                                 mRefreshLayout.setHeaderRefreshing(false);
                                 mRefreshLayout.setFooterRefreshing(false);
@@ -477,7 +468,7 @@ public class ContentLayout extends FrameLayout {
                         // assert mStartPage >= 0
 
                         if (data.isEmpty()) {
-                            if (true || mStartPage <= 0) { // OK, that's all
+                            if (mStartPage <= 0) { // OK, that's all
                                 if (mData.isEmpty()) {
                                     // Ui change, show empty string
                                     mRefreshLayout.setHeaderRefreshing(false);
@@ -536,7 +527,7 @@ public class ContentLayout extends FrameLayout {
                         mEndPage++;
 
                         if (data.isEmpty()) {
-                            if (true || mEndPage >= mPages) { // OK, that's all
+                            if (mEndPage >= mPages) { // OK, that's all
                                 if (mData.isEmpty()) {
                                     // Ui change, show empty string
                                     mRefreshLayout.setHeaderRefreshing(false);
@@ -595,7 +586,7 @@ public class ContentLayout extends FrameLayout {
                             mData.clear();
                             notifyDataSetChanged();
 
-                            if (true || mEndPage >= mPages) { // Not found
+                            if (mEndPage >= mPages) { // Not found
                                 // Ui change, show empty string
                                 mRefreshLayout.setHeaderRefreshing(false);
                                 mRefreshLayout.setFooterRefreshing(false);
@@ -640,8 +631,7 @@ public class ContentLayout extends FrameLayout {
                         int oldIndexStart = mCurrentTaskPage == mStartPage ? 0 : mPageDivider.get(mCurrentTaskPage - mStartPage - 1);
                         int oldIndexEnd = mPageDivider.get(mCurrentTaskPage - mStartPage);
                         mData.subList(oldIndexStart, oldIndexEnd).clear();
-                        int newIndexStart = oldIndexStart;
-                        int newIndexEnd = newIndexStart + data.size();
+                        int newIndexEnd = oldIndexStart + data.size();
                         mData.addAll(oldIndexStart, data);
                         notifyDataSetChanged();
 
@@ -693,7 +683,7 @@ public class ContentLayout extends FrameLayout {
             }
         }
 
-        public void showContent() {
+        private void showContent() {
             mViewTransition.showView(0);
         }
 
@@ -701,20 +691,21 @@ public class ContentLayout extends FrameLayout {
             return mViewTransition.getShownViewIndex() == 0;
         }
 
-        public void showProgressBar() {
+        private void showProgressBar() {
             showProgressBar(true);
         }
 
-        public void showProgressBar(boolean animation) {
+        private void showProgressBar(boolean animation) {
             mViewTransition.showView(1, animation);
         }
 
+        @SuppressLint("SetTextI18n")
         public void showText(CharSequence text) {
             mTipView.setText(text + "\n\n" + getContext().getString(R.string.help_route));
             mViewTransition.showView(2);
         }
 
-        public void showEmptyString() {
+        private void showEmptyString() {
             showText(mEmptyString);
         }
 
@@ -819,7 +810,6 @@ public class ContentLayout extends FrameLayout {
          * Check range first!
          *
          * @param page the target page
-         * @throws IndexOutOfBoundsException
          */
         public void goTo(int page) throws IndexOutOfBoundsException {
             if (page < 0 || page >= mPages) {
@@ -893,6 +883,7 @@ public class ContentLayout extends FrameLayout {
                 mSavedDataId = bundle.getInt(KEY_DATA);
                 EhApplication app = (EhApplication) getContext().getApplicationContext();
                 if (mSavedDataId != IntIdGenerator.INVALID_ID) {
+                    @SuppressWarnings("unchecked")
                     ArrayList<E> data = (ArrayList<E>) app.removeGlobalStuff(mSavedDataId);
                     mSavedDataId = IntIdGenerator.INVALID_ID;
                     if (data != null) {

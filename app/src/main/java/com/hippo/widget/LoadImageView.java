@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -132,6 +133,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         clearDrawable();
     }
 
+    @SuppressLint("RestrictedApi")
     private ImageDrawable getImageDrawable() {
         Drawable drawable = getDrawable();
         if (drawable instanceof TransitionDrawable) {
@@ -310,15 +312,19 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         mFailed = true;
         clearDrawable();
         setImageDrawable(getContext().getResources().getDrawable(R.drawable.image_failed));
-        if (mRetryType == RETRY_TYPE_CLICK) {
-            setOnClickListener(this);
-        } else if (mRetryType == RETRY_TYPE_LONG_CLICK) {
-            setOnLongClickListener(this);
-        } else {
-            // Can't retry, so release
-            mKey = null;
-            mUrl = null;
-            mContainer = null;
+        switch (mRetryType) {
+            case RETRY_TYPE_CLICK:
+                setOnClickListener(this);
+                break;
+            case RETRY_TYPE_LONG_CLICK:
+                setOnLongClickListener(this);
+                break;
+            default:
+                // Can't retry, so release
+                mKey = null;
+                mUrl = null;
+                mContainer = null;
+                break;
         }
     }
 
@@ -346,11 +352,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     @Override
     public boolean isRunning() {
         ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            return drawable.isRunning();
-        } else {
-            return false;
-        }
+        return drawable != null && drawable.isRunning();
     }
 
     @Override

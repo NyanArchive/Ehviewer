@@ -48,18 +48,22 @@ public class EhFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-        if (Settings.KEY_GALLERY_SITE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
-            return true;
-        } else if (Settings.KEY_LIST_MODE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
-            return true;
-        } else if (Settings.KEY_DETAIL_SIZE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
-        } else if (Settings.KEY_THUMB_SIZE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
-        } else if (Settings.KEY_NIGHT_MODE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
+        switch (key) {
+            case Settings.KEY_GALLERY_SITE:
+                getActivity().setResult(Activity.RESULT_OK);
+                return true;
+            case Settings.KEY_LIST_MODE:
+                getActivity().setResult(Activity.RESULT_OK);
+                return true;
+            case Settings.KEY_DETAIL_SIZE:
+                getActivity().setResult(Activity.RESULT_OK);
+                break;
+            case Settings.KEY_THUMB_SIZE:
+                getActivity().setResult(Activity.RESULT_OK);
+                break;
+            case Settings.KEY_NIGHT_MODE:
+                getActivity().setResult(Activity.RESULT_OK);
+                break;
         }
         return true;
     }

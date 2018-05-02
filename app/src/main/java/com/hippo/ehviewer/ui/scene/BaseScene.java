@@ -16,10 +16,12 @@
 
 package com.hippo.ehviewer.ui.scene;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.StyleRes;
@@ -154,7 +156,7 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Update left drawer locked state
@@ -168,7 +170,8 @@ public abstract class BaseScene extends SceneFragment {
         setNavCheckedItem(getNavCheckedItem());
 
         // Hide soft ime
-        AppHelper.hideSoftInput(getActivity());
+        FragmentActivity activity = getActivity();
+        if (activity != null) AppHelper.hideSoftInput(activity);
     }
 
     public void createThemeContext(@StyleRes int style) {
@@ -210,7 +213,7 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public void hideSoftInput() {
-        FragmentActivity activity = getActivity();
+        MainActivity activity = getActivity2();
         if (null != activity) {
             AppHelper.hideSoftInput(activity);
         }

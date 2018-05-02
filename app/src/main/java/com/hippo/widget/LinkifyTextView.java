@@ -56,8 +56,8 @@ public class LinkifyTextView extends ObservedTextView {
         // onTouchEven must be called with MotionEvent.ACTION_DOWN for each touch
         // action on it, so we analyze touched url here.
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            performClick();
             mCurrentSpan = null;
-
             if (getText() instanceof Spanned) {
                 // Get this code from android.text.method.LinkMovementMethod.
                 // Work fine !
@@ -85,5 +85,10 @@ public class LinkifyTextView extends ObservedTextView {
         }
 
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

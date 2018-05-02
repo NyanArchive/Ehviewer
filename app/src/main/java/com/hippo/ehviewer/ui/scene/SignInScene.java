@@ -116,7 +116,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         outState.putInt(KEY_REQUEST_ID, mRequestId);
     }
 
-    @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -163,7 +162,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Show IME

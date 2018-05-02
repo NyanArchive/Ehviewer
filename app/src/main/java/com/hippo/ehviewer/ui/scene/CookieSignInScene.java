@@ -17,9 +17,9 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -114,7 +114,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
 
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         showSoftInput(mIpbMemberId);
@@ -203,13 +203,10 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
             new AlertDialog.Builder(context).setTitle(R.string.waring)
                     .setMessage(R.string.wrong_cookie_warning)
                     .setNegativeButton(R.string.i_dont_think_so, null)
-                    .setPositiveButton(R.string.i_will_check_it, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            storeCookie(ipbMemberId, ipbPassHash, igneous);
-                            setResult(RESULT_OK, null);
-                            finish();
-                        }
+                    .setPositiveButton(R.string.i_will_check_it, (dialog, which) -> {
+                        storeCookie(ipbMemberId, ipbPassHash, igneous);
+                        setResult(RESULT_OK, null);
+                        finish();
                     }).show();
         } else {
             storeCookie(ipbMemberId, ipbPassHash, igneous);

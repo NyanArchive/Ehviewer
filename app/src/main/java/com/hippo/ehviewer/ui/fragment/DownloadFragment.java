@@ -93,17 +93,14 @@ public class DownloadFragment extends PreferenceFragment implements
     }
 
     private void showDirPickerDialogL() {
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        openDirPicker();
-                        break;
-                    case DialogInterface.BUTTON_NEUTRAL:
-                        openDirPickerL();
-                        break;
-                }
+        DialogInterface.OnClickListener listener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    openDirPicker();
+                    break;
+                case DialogInterface.BUTTON_NEUTRAL:
+                    openDirPickerL();
+                    break;
             }
         };
 

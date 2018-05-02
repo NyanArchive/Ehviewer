@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -81,7 +82,7 @@ public final class SettingsActivity extends EhPreferenceActivity {
     private void replaceHeaderLayoutResId() {
         try {
             ListAdapter adapter = getListAdapter();
-            Class headerAdapterClazz = Class.forName("android.preference.PreferenceActivity$HeaderAdapter");
+            @SuppressLint("PrivateApi") Class headerAdapterClazz = Class.forName("android.preference.PreferenceActivity$HeaderAdapter");
             if (!headerAdapterClazz.isInstance(adapter)) {
                 return;
             }

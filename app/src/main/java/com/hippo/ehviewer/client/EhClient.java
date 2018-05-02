@@ -121,12 +121,7 @@ public class EhClient {
                 if (mCallback != null) {
                     // TODO Avoid new runnable
                     final Callback finalCallback = mCallback;
-                    SimpleHandler.getInstance().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            finalCallback.onCancel();
-                        }
-                    });
+                    SimpleHandler.getInstance().post(finalCallback::onCancel);
                 }
 
                 Status status = getStatus();

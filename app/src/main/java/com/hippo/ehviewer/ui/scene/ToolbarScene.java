@@ -19,6 +19,7 @@ package com.hippo.ehviewer.ui.scene;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
@@ -49,8 +50,8 @@ public abstract class ToolbarScene extends BaseScene {
     public final View onCreateView2(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_toolbar, container, false);
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        FrameLayout contentPanel = (FrameLayout) view.findViewById(R.id.content_panel);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        FrameLayout contentPanel = view.findViewById(R.id.content_panel);
 
         View contentView = onCreateView3(inflater, contentPanel, savedInstanceState);
         if (contentView == null) {
@@ -69,7 +70,7 @@ public abstract class ToolbarScene extends BaseScene {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (mToolbar != null) {
             if (mTempTitle != null) {
@@ -80,20 +81,10 @@ public abstract class ToolbarScene extends BaseScene {
             int menuResId = getMenuResId();
             if (menuResId != 0) {
                 mToolbar.inflateMenu(menuResId);
-                mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        return ToolbarScene.this.onMenuItemClick(item);
-                    }
-                });
+                mToolbar.setOnMenuItemClickListener(ToolbarScene.this::onMenuItemClick);
                 onMenuCreated(mToolbar.getMenu());
             }
-            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onNavigationClick();
-                }
-            });
+            mToolbar.setNavigationOnClickListener(v -> onNavigationClick());
         }
     }
 

@@ -38,7 +38,6 @@ import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -207,11 +206,7 @@ public class FavoritesScene extends BaseScene implements
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
-        if (mHelper != null && 1 == mHelper.getShownViewIndex()) {
-            hasFirstRefresh = false;
-        } else {
-            hasFirstRefresh = mHasFirstRefresh;
-        }
+        hasFirstRefresh = (mHelper == null || 1 != mHelper.getShownViewIndex()) && mHasFirstRefresh;
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
         outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder);
         outState.putBoolean(KEY_SEARCH_MODE, mSearchMode);
@@ -234,7 +229,7 @@ public class FavoritesScene extends BaseScene implements
     public View onCreateView2(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
-        ContentLayout contentLayout = (ContentLayout) view.findViewById(R.id.content_layout);
+        ContentLayout contentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getActivity2();
         Assert.assertNotNull(activity);
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
@@ -441,23 +436,27 @@ public class FavoritesScene extends BaseScene implements
         @Override
         @SuppressLint("SetTextI18n")
         public void onBindViewHolder(@NonNull FavDrawerHolder holder, int position) {
-            if (0 == position) {
-                holder.key.setText(R.string.local_favorites);
-                holder.value.setText(Integer.toString(mFavLocalCount));
-                holder.itemView.setEnabled(true);
-            } else if (1 == position){
-                holder.key.setText(R.string.cloud_favorites);
-                holder.value.setText(Integer.toString(mFavCountSum));
-                holder.itemView.setEnabled(true);
-            } else {
-                if (null == mFavCatArray || null == mFavCountArray ||
-                        mFavCatArray.length < (position - 1) ||
-                        mFavCountArray.length < (position - 1)) {
-                    return;
-                }
-                holder.key.setText(mFavCatArray[position - 2]);
-                holder.value.setText(Integer.toString(mFavCountArray[position - 2]));
-                holder.itemView.setEnabled(true);
+            switch (position) {
+                case 0:
+                    holder.key.setText(R.string.local_favorites);
+                    holder.value.setText(Integer.toString(mFavLocalCount));
+                    holder.itemView.setEnabled(true);
+                    break;
+                case 1:
+                    holder.key.setText(R.string.cloud_favorites);
+                    holder.value.setText(Integer.toString(mFavCountSum));
+                    holder.itemView.setEnabled(true);
+                    break;
+                default:
+                    if (null == mFavCatArray || null == mFavCountArray ||
+                            mFavCatArray.length < (position - 1) ||
+                            mFavCountArray.length < (position - 1)) {
+                        return;
+                    }
+                    holder.key.setText(mFavCatArray[position - 2]);
+                    holder.value.setText(Integer.toString(mFavCountArray[position - 2]));
+                    holder.itemView.setEnabled(true);
+                    break;
             }
         }
 
@@ -481,32 +480,24 @@ public class FavoritesScene extends BaseScene implements
 
         toolbar.setTitle(R.string.collections);
         toolbar.inflateMenu(R.menu.drawer_favorites);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_default_favorites_slot:
-                        String[] items = new String[12];
-                        items[0] = getString(R.string.let_me_select);
-                        items[1] = getString(R.string.local_favorites);
-                        String[] favCat = Settings.getFavCat();
-                        System.arraycopy(favCat, 0, items, 2, 10);
-                        new AlertDialog.Builder(context)
-                                .setTitle(R.string.default_favorites_collection)
-                                .setItems(items, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Settings.putDefaultFavSlot(which - 2);
-                                    }
-                                }).show();
-                        return true;
-                }
-                return false;
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_default_favorites_slot:
+                    String[] items = new String[12];
+                    items[0] = getString(R.string.let_me_select);
+                    items[1] = getString(R.string.local_favorites);
+                    String[] favCat = Settings.getFavCat();
+                    System.arraycopy(favCat, 0, items, 2, 10);
+                    new AlertDialog.Builder(context)
+                            .setTitle(R.string.default_favorites_collection)
+                            .setItems(items, (dialog, which) -> Settings.putDefaultFavSlot(which - 2)).show();
+                    return true;
             }
+            return false;
         });
 
-        EasyRecyclerView recyclerView = (EasyRecyclerView) view.findViewById(R.id.recycler_view_drawer);
+        EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
 
@@ -1049,12 +1040,7 @@ public class FavoritesScene extends BaseScene implements
                 }
             } else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 final String keyword = mUrlBuilder.getKeyword();
-                SimpleHandler.getInstance().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onGetFavoritesLocal(keyword, taskId);
-                    }
-                });
+                SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
             } else {
                 mUrlBuilder.setIndex(page);
                 String url = mUrlBuilder.build();

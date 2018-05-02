@@ -133,12 +133,7 @@ public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.At
                     fabTranslationYAnimator = ValueAnimator.ofFloat();
                     fabTranslationYAnimator.setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR);
                     fabTranslationYAnimator.addUpdateListener(
-                            new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    child.setTranslationY((Float) animation.getAnimatedValue());
-                                }
-                            });
+                            animation -> child.setTranslationY((Float) animation.getAnimatedValue()));
                     child.setTag(R.id.fab_translation_y_animator, fabTranslationYAnimator);
                 }
                 fabTranslationYAnimator.setFloatValues(currentTransY, targetTransY);

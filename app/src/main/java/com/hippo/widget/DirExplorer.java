@@ -18,6 +18,7 @@ package com.hippo.widget;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -144,13 +145,14 @@ public class DirExplorer extends EasyRecyclerView implements EasyRecyclerView.On
 
     private class DirAdapter extends Adapter<DirHolder> {
 
+        @NonNull
         @Override
-        public DirHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public DirHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new DirHolder( LayoutInflater.from(getContext()).inflate(R.layout.item_dir_explorer, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(DirHolder holder, int position) {
+        public void onBindViewHolder(@NonNull DirHolder holder, int position) {
             File file = mFiles.get(position);
             holder.textView.setText(file == PARENT_DIR ? PARENT_DIR_NAME : file.getName());
         }

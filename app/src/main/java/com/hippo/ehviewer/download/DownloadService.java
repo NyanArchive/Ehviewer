@@ -108,7 +108,7 @@ public class DownloadService extends Service implements DownloadManager.Download
 
         CHANNEL_ID = getPackageName()+".download";
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && mNotifyManager != null){
             mNotifyManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID, getString(R.string.download_service),
                     NotificationManager.IMPORTANCE_LOW));
         }
@@ -151,51 +151,71 @@ public class DownloadService extends Service implements DownloadManager.Download
             action = intent.getAction();
         }
 
-        if (ACTION_START.equals(action)) {
-            GalleryInfo gi = intent.getParcelableExtra(KEY_GALLERY_INFO);
-            String label = intent.getStringExtra(KEY_LABEL);
-            if (gi != null && mDownloadManager != null) {
-                mDownloadManager.startDownload(gi, label);
+        if (action == null) {
+            return;
+        }
+
+        switch (action) {
+            case ACTION_START:
+                GalleryInfo gi = intent.getParcelableExtra(KEY_GALLERY_INFO);
+                String label = intent.getStringExtra(KEY_LABEL);
+                if (gi != null && mDownloadManager != null) {
+                    mDownloadManager.startDownload(gi, label);
+                }
+                break;
+            case ACTION_START_RANGE: {
+                LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
+                if (gidList != null && mDownloadManager != null) {
+                    mDownloadManager.startRangeDownload(gidList);
+                }
+                break;
             }
-        } else if (ACTION_START_RANGE.equals(action)) {
-            LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
-            if (gidList != null && mDownloadManager != null) {
-                mDownloadManager.startRangeDownload(gidList);
+            case ACTION_START_ALL:
+                if (mDownloadManager != null) {
+                    mDownloadManager.startAllDownload();
+                }
+                break;
+            case ACTION_STOP: {
+                long gid = intent.getLongExtra(KEY_GID, -1);
+                if (gid != -1 && mDownloadManager != null) {
+                    mDownloadManager.stopDownload(gid);
+                }
+                break;
             }
-        } else if (ACTION_START_ALL.equals(action)) {
-            if (mDownloadManager != null) {
-                mDownloadManager.startAllDownload();
+            case ACTION_STOP_CURRENT:
+                if (mDownloadManager != null) {
+                    mDownloadManager.stopCurrentDownload();
+                }
+                break;
+            case ACTION_STOP_RANGE: {
+                LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
+                if (gidList != null && mDownloadManager != null) {
+                    mDownloadManager.stopRangeDownload(gidList);
+                }
+                break;
             }
-        } else if (ACTION_STOP.equals(action)) {
-            long gid = intent.getLongExtra(KEY_GID, -1);
-            if (gid != -1 && mDownloadManager != null) {
-                mDownloadManager.stopDownload(gid);
+            case ACTION_STOP_ALL:
+                if (mDownloadManager != null) {
+                    mDownloadManager.stopAllDownload();
+                }
+                break;
+            case ACTION_DELETE: {
+                long gid = intent.getLongExtra(KEY_GID, -1);
+                if (gid != -1 && mDownloadManager != null) {
+                    mDownloadManager.deleteDownload(gid);
+                }
+                break;
             }
-        } else if (ACTION_STOP_CURRENT.equals(action)) {
-            if (mDownloadManager != null) {
-                mDownloadManager.stopCurrentDownload();
+            case ACTION_DELETE_RANGE: {
+                LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
+                if (gidList != null && mDownloadManager != null) {
+                    mDownloadManager.deleteRangeDownload(gidList);
+                }
+                break;
             }
-        } else if (ACTION_STOP_RANGE.equals(action)) {
-            LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
-            if (gidList != null && mDownloadManager != null) {
-                mDownloadManager.stopRangeDownload(gidList);
-            }
-        } else if (ACTION_STOP_ALL.equals(action)) {
-            if (mDownloadManager != null) {
-                mDownloadManager.stopAllDownload();
-            }
-        } else if (ACTION_DELETE.equals(action)) {
-            long gid = intent.getLongExtra(KEY_GID, -1);
-            if (gid != -1 && mDownloadManager != null) {
-                mDownloadManager.deleteDownload(gid);
-            }
-        } else if (ACTION_DELETE_RANGE.equals(action)) {
-            LongList gidList = intent.getParcelableExtra(KEY_GID_LIST);
-            if (gidList != null && mDownloadManager != null) {
-                mDownloadManager.deleteRangeDownload(gidList);
-            }
-        } else if (ACTION_CLEAR.equals(action)) {
-            clear();
+            case ACTION_CLEAR:
+                clear();
+                break;
         }
 
         checkStopSelf();
@@ -426,11 +446,10 @@ public class DownloadService extends Service implements DownloadManager.Download
             style = new NotificationCompat.InboxStyle();
             style.setBigContentTitle(getString(R.string.stat_download_done_title));
             SparseJBArray stateArray = sItemStateArray;
-            SparseJLArray<String> titleArray = sItemTitleArray;
             for (int i = 0, n = stateArray.size(); i < n; i++) {
                 long id = stateArray.keyAt(i);
                 boolean fin = stateArray.valueAt(i);
-                String title = titleArray.get(id);
+                String title = sItemTitleArray.get(id);
                 if (title == null) {
                     continue;
                 }

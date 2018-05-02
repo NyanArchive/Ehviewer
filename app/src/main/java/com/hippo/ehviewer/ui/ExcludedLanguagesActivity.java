@@ -218,11 +218,10 @@ public class ExcludedLanguagesActivity extends ToolbarActivity
     }
 
     private long saveSelectionsToLong() {
-        boolean[][] selections = mSelections;
         long value = 0;
         for (int i = 0; i < ROW_COUNT; i++) {
             for (int j = 0; j < 3; j++) {
-                if (selections[i][j]) {
+                if (mSelections[i][j]) {
                     value |= 1 << (i * 3 + j);
                 }
             }
@@ -231,10 +230,9 @@ public class ExcludedLanguagesActivity extends ToolbarActivity
     }
 
     private void restoreSelectionsFromLong(long value) {
-        boolean[][] selections = mSelections;
         for (int i = 0; i < ROW_COUNT; i++) {
             for (int j = 0; j < 3; j++) {
-                selections[i][j] = 0 != ((value >>> (i * 3 + j)) & 1);
+                mSelections[i][j] = 0 != ((value >>> (i * 3 + j)) & 1);
             }
         }
     }
@@ -373,13 +371,14 @@ public class ExcludedLanguagesActivity extends ToolbarActivity
 
     private class LanguageAdapter extends RecyclerView.Adapter<LanguageHolder> {
 
+        @NonNull
         @Override
-        public LanguageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public LanguageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new LanguageHolder(getLayoutInflater().inflate(R.layout.item_excluded_languages, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(LanguageHolder holder, int position) {
+        public void onBindViewHolder(@NonNull LanguageHolder holder, int position) {
             holder.language.setText(LANGUAGE_STR_IDS[position]);
             boolean[] selections = mSelections[position];
             holder.original.setChecked(selections[0]);

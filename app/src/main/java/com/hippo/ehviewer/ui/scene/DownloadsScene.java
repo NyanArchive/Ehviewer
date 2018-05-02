@@ -295,7 +295,7 @@ public class DownloadsScene extends ToolbarScene
         mViewTransition = new ViewTransition(content, tip);
 
         Context context = getContext2();
-        Assert.assertNotNull(content);
+        Assert.assertNotNull(context);
         Resources resources = context.getResources();
 
         Drawable drawable = DrawableManager.getDrawable(context, R.drawable.big_download);
@@ -436,7 +436,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateTitle();
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -519,63 +519,57 @@ public class DownloadsScene extends ToolbarScene
         final Context context = getContext2();
         Assert.assertNotNull(context);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.download_labels);
         toolbar.inflateMenu(R.menu.drawer_download);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_add:
-                        EditTextDialogBuilder builder = new EditTextDialogBuilder(context, null, getString(R.string.download_labels));
-                        builder.setTitle(R.string.new_label_title);
-                        builder.setPositiveButton(android.R.string.ok, null);
-                        AlertDialog dialog = builder.show();
-                        new NewLabelDialogHelper(builder, dialog);
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_add:
+                    EditTextDialogBuilder builder = new EditTextDialogBuilder(context, null, getString(R.string.download_labels));
+                    builder.setTitle(R.string.new_label_title);
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.show();
+                    new NewLabelDialogHelper(builder, dialog);
+                    return true;
+                case R.id.action_default_download_label:
+                    DownloadManager dm = mDownloadManager;
+                    if (null == dm) {
                         return true;
-                    case R.id.action_default_download_label:
-                        DownloadManager dm = mDownloadManager;
-                        if (null == dm) {
-                            return true;
-                        }
+                    }
 
-                        List<DownloadLabel> list = dm.getLabelList();
-                        final String[] items = new String[list.size() + 2];
-                        items[0] = getString(R.string.let_me_select);
-                        items[1] = getString(R.string.default_download_label_name);
-                        for (int i = 0, n = list.size(); i < n; i++) {
-                            items[i + 2] = list.get(i).getLabel();
-                        }
-                        new AlertDialog.Builder(context)
-                                .setTitle(R.string.default_download_label)
-                                .setItems(items, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (which == 0) {
-                                            Settings.putHasDefaultDownloadLabel(false);
-                                        } else {
-                                            Settings.putHasDefaultDownloadLabel(true);
-                                            String label;
-                                            if (which == 1) {
-                                                label = null;
-                                            } else {
-                                                label = items[which];
-                                            }
-                                            Settings.putDefaultDownloadLabel(label);
-                                        }
+                    List<DownloadLabel> list = dm.getLabelList();
+                    final String[] items = new String[list.size() + 2];
+                    items[0] = getString(R.string.let_me_select);
+                    items[1] = getString(R.string.default_download_label_name);
+                    for (int i = 0, n = list.size(); i < n; i++) {
+                        items[i + 2] = list.get(i).getLabel();
+                    }
+                    new AlertDialog.Builder(context)
+                            .setTitle(R.string.default_download_label)
+                            .setItems(items, (dialog1, which) -> {
+                                if (which == 0) {
+                                    Settings.putHasDefaultDownloadLabel(false);
+                                } else {
+                                    Settings.putHasDefaultDownloadLabel(true);
+                                    String label;
+                                    if (which == 1) {
+                                        label = null;
+                                    } else {
+                                        label = items[which];
                                     }
-                                }).show();
-                        return true;
-                }
-                return false;
+                                    Settings.putDefaultDownloadLabel(label);
+                                }
+                            }).show();
+                    return true;
             }
+            return false;
         });
 
         initLabels();
 
         mLabelAdapter = new DownloadLabelAdapter(inflater);
-        final EasyRecyclerView recyclerView =  (EasyRecyclerView) view.findViewById(R.id.recycler_view_drawer);
+        final EasyRecyclerView recyclerView =  view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(mLabelAdapter);
@@ -623,6 +617,7 @@ public class DownloadsScene extends ToolbarScene
             return new DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false));
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void onBindViewHolder(@NonNull DownloadLabelHolder holder, int position) {
             if (mLabels != null){
@@ -650,58 +645,48 @@ public class DownloadsScene extends ToolbarScene
                     holder.option.setVisibility(View.GONE);
                 }
 
-                holder.label.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String label;
-                        if (position == 0) {
-                            label = null;
-                        } else {
-                            label = mLabels.get(position);
-                        }
-                        if (!ObjectUtils.equal(label, mLabel)) {
-                            mLabel = label;
-                            updateForLabel();
-                            updateView();
-                            closeDrawer(Gravity.RIGHT);
-                        }
+                holder.label.setOnClickListener(v -> {
+                    String label1;
+                    if (position == 0) {
+                        label1 = null;
+                    } else {
+                        label1 = mLabels.get(position);
+                    }
+                    if (!ObjectUtils.equal(label1, mLabel)) {
+                        mLabel = label1;
+                        updateForLabel();
+                        updateView();
+                        closeDrawer(Gravity.RIGHT);
                     }
                 });
 
                 if (position > 0){
-                    holder.option.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (context != null){
-                                PopupMenu popupMenu = new PopupMenu(context, holder.option);
-                                popupMenu.inflate(R.menu.download_label_option);
-                                popupMenu.show();
-                                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem item) {
-                                        switch (item.getItemId()){
-                                            case R.id.menu_label_rename:
-                                                if (mListLabel != null && position <= mListLabel.size()){
-                                                    DownloadLabel raw = mListLabel.get(position-1);
-                                                    EditTextDialogBuilder builder = new EditTextDialogBuilder(
-                                                            context, raw.getLabel(), getString(R.string.download_labels));
-                                                    builder.setTitle(R.string.rename_label_title);
-                                                    builder.setPositiveButton(android.R.string.ok, null);
-                                                    AlertDialog dialog = builder.show();
-                                                    new RenameLabelDialogHelper(builder, dialog, raw.getLabel());
-                                                }
-                                                break;
-                                            case R.id.menu_label_remove:
-                                                mDownloadManager.deleteLabel(label);
-                                                mLabels.remove(position);
-                                                notifyDataSetChanged();
-                                                break;
+                    holder.option.setOnClickListener(v -> {
+                        if (context != null){
+                            PopupMenu popupMenu = new PopupMenu(context, holder.option);
+                            popupMenu.inflate(R.menu.download_label_option);
+                            popupMenu.show();
+                            popupMenu.setOnMenuItemClickListener(item -> {
+                                switch (item.getItemId()){
+                                    case R.id.menu_label_rename:
+                                        if (mListLabel != null && position <= mListLabel.size()){
+                                            DownloadLabel raw = mListLabel.get(position-1);
+                                            EditTextDialogBuilder builder = new EditTextDialogBuilder(
+                                                    context, raw.getLabel(), getString(R.string.download_labels));
+                                            builder.setTitle(R.string.rename_label_title);
+                                            builder.setPositiveButton(android.R.string.ok, null);
+                                            AlertDialog dialog = builder.show();
+                                            new RenameLabelDialogHelper(builder, dialog, raw.getLabel());
                                         }
-                                        return false;
-                                    }
-                                });
-                            }
+                                        break;
+                                    case R.id.menu_label_remove:
+                                        mDownloadManager.deleteLabel(label);
+                                        mLabels.remove(position);
+                                        notifyDataSetChanged();
+                                        break;
+                                }
+                                return false;
+                            });
                         }
                     });
                 }
@@ -851,6 +836,7 @@ public class DownloadsScene extends ToolbarScene
                     break;
                 }
                 case 3: { // Delete
+                    @SuppressLint("StringFormatMatches")
                     CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
                             getString(R.string.download_remove_dialog_message_2, gidList.size()),
                             getString(R.string.download_remove_dialog_check_text),
@@ -1187,17 +1173,17 @@ public class DownloadsScene extends ToolbarScene
         private DownloadHolder(View itemView) {
             super(itemView);
 
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
             start = itemView.findViewById(R.id.start);
             stop = itemView.findViewById(R.id.stop);
-            state = (TextView) itemView.findViewById(R.id.state);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-            percent = (TextView) itemView.findViewById(R.id.percent);
-            speed = (TextView) itemView.findViewById(R.id.speed);
+            state = itemView.findViewById(R.id.state);
+            progressBar = itemView.findViewById(R.id.progress_bar);
+            percent = itemView.findViewById(R.id.percent);
+            speed = itemView.findViewById(R.id.speed);
 
             // TODO cancel on click listener when select items
             thumb.setOnClickListener(this);

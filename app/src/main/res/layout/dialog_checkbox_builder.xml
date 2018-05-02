@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="?android:attr/dialogPreferredPadding"
-            android:paddingTop="@dimen/abc_dialog_padding_top_material"
+            android:paddingTop="@dimen/dialog_padding_top_material"
             android:paddingRight="?android:attr/dialogPreferredPadding"/>
 
     </com.hippo.widget.IndicatingScrollView>
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="?android:attr/dialogPreferredPadding"
-        android:layout_marginTop="@dimen/abc_dialog_padding_top_material"
+        android:layout_marginTop="@dimen/dialog_padding_top_material"
         android:layout_marginRight="?android:attr/dialogPreferredPadding"/>
 
 </LinearLayout>

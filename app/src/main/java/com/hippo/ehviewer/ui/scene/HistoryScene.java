@@ -153,7 +153,7 @@ public class HistoryScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.history);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -210,18 +210,15 @@ public class HistoryScene extends ToolbarScene
     private void showClearAllDialog(Context context) {
         new AlertDialog.Builder(context)
                 .setMessage(R.string.clear_all_history)
-                .setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
-                            return;
-                        }
-
-                        EhDB.clearHistoryInfo();
-                        updateLazyList();
-                        mAdapter.notifyDataSetChanged();
-                        updateView(true);
+                .setPositiveButton(R.string.clear_all, (dialog, which) -> {
+                    if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
+                        return;
                     }
+
+                    EhDB.clearHistoryInfo();
+                    updateLazyList();
+                    mAdapter.notifyDataSetChanged();
+                    updateView(true);
                 }).show();
     }
 
@@ -272,19 +269,16 @@ public class HistoryScene extends ToolbarScene
         final GalleryInfo gi = mLazyList.get(position);
         new AlertDialog.Builder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
-                .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Download
-                                CommonOperations.startDownload(activity, gi, false);
-                                break;
-                            case 1: // Favorites
-                                CommonOperations.addToFavorites(activity, gi,
-                                        new addToFavoriteListener(context,
-                                                activity.getStageId(), getTag()));
-                                break;
-                        }
+                .setItems(R.array.gallery_list_menu_entries, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Download
+                            CommonOperations.startDownload(activity, gi, false);
+                            break;
+                        case 1: // Favorites
+                            CommonOperations.addToFavorites(activity, gi,
+                                    new addToFavoriteListener(context,
+                                            activity.getStageId(), getTag()));
+                            break;
                     }
                 }).show();
         return true;
@@ -303,13 +297,13 @@ public class HistoryScene extends ToolbarScene
         private HistoryHolder(View itemView) {
             super(itemView);
 
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
-            posted = (TextView) itemView.findViewById(R.id.posted);
-            simpleLanguage = (TextView) itemView.findViewById(R.id.simple_language);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
+            posted = itemView.findViewById(R.id.posted);
+            simpleLanguage = itemView.findViewById(R.id.simple_language);
         }
 
         @Override

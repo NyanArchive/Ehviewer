@@ -42,7 +42,6 @@ import android.transition.TransitionInflater;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -380,7 +379,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         if (mAction != null) {
@@ -532,7 +531,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -651,22 +650,26 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void ensureActionDrawable(Context context) {
-        Drawable heart = DrawableManager.getDrawable(context, R.drawable.v_heart_primary_x48);
-        setActionDrawable(mHeart, heart);
-        Drawable heartOutline = DrawableManager.getDrawable(context, R.drawable.v_heart_outline_primary_x48);
-        setActionDrawable(mHeartOutline, heartOutline);
-        Drawable torrent = DrawableManager.getDrawable(context, R.drawable.v_utorrent_primary_x48);
-        setActionDrawable(mTorrent, torrent);
-        Drawable archive = DrawableManager.getDrawable(context, R.drawable.v_archive_primary_x48);
-        setActionDrawable(mArchive, archive);
-        Drawable share = DrawableManager.getDrawable(context, R.drawable.v_share_primary_x48);
-        setActionDrawable(mShare, share);
-        Drawable rate = DrawableManager.getDrawable(context, R.drawable.v_thumb_up_primary_x48);
-        setActionDrawable(mRate, rate);
-        Drawable similar = DrawableManager.getDrawable(context, R.drawable.v_similar_primary_x48);
-        setActionDrawable(mSimilar, similar);
-        Drawable searchCover = DrawableManager.getDrawable(context, R.drawable.v_file_find_primary_x48);
-        setActionDrawable(mSearchCover, searchCover);
+        if (mHeart != null && mHeartOutline != null && mTorrent != null
+                && mArchive != null && mShare != null && mRate != null
+                && mSimilar != null && mSearchCover != null) {
+            Drawable heart = DrawableManager.getDrawable(context, R.drawable.v_heart_primary_x48);
+            setActionDrawable(mHeart, heart);
+            Drawable heartOutline = DrawableManager.getDrawable(context, R.drawable.v_heart_outline_primary_x48);
+            setActionDrawable(mHeartOutline, heartOutline);
+            Drawable torrent = DrawableManager.getDrawable(context, R.drawable.v_utorrent_primary_x48);
+            setActionDrawable(mTorrent, torrent);
+            Drawable archive = DrawableManager.getDrawable(context, R.drawable.v_archive_primary_x48);
+            setActionDrawable(mArchive, archive);
+            Drawable share = DrawableManager.getDrawable(context, R.drawable.v_share_primary_x48);
+            setActionDrawable(mShare, share);
+            Drawable rate = DrawableManager.getDrawable(context, R.drawable.v_thumb_up_primary_x48);
+            setActionDrawable(mRate, rate);
+            Drawable similar = DrawableManager.getDrawable(context, R.drawable.v_similar_primary_x48);
+            setActionDrawable(mSimilar, similar);
+            Drawable searchCover = DrawableManager.getDrawable(context, R.drawable.v_file_find_primary_x48);
+            setActionDrawable(mSearchCover, searchCover);
+        }
     }
 
     private boolean createCircularReveal() {
@@ -724,12 +727,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if ((oldState == STATE_INIT || oldState == STATE_FAILED || oldState == STATE_REFRESH) &&
                 (state == STATE_NORMAL || state == STATE_REFRESH_HEADER)) {
             if (!createCircularReveal()) {
-                SimpleHandler.getInstance().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        createCircularReveal();
-                    }
-                });
+                SimpleHandler.getInstance().post(this::createCircularReveal);
             }
         }
     }
@@ -879,11 +877,11 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             GalleryComment comment = comments[i];
             View v = inflater.inflate(R.layout.item_gallery_comment, mComments, false);
             mComments.addView(v, i);
-            TextView user = (TextView) v.findViewById(R.id.user);
+            TextView user = v.findViewById(R.id.user);
             user.setText(comment.user);
-            TextView time = (TextView) v.findViewById(R.id.time);
+            TextView time = v.findViewById(R.id.time);
             time.setText(ReadableTime.getTimeAgo(comment.time));
-            ObservedTextView c = (ObservedTextView) v.findViewById(R.id.comment);
+            ObservedTextView c = v.findViewById(R.id.comment);
             c.setMaxLines(5);
             c.setText(Html.fromHtml(comment.comment,
                     new URLImageGetter(c, EhApplication.getConaco(context)), null));
@@ -916,11 +914,11 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             View view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false);
             mGridLayout.addView(view);
 
-            LoadImageView image = (LoadImageView) view.findViewById(R.id.image);
+            LoadImageView image = view.findViewById(R.id.image);
             previewSet.load(image, gd.gid, i);
             image.setTag(R.id.index, i);
             image.setOnClickListener(this);
-            TextView text = (TextView) view.findViewById(R.id.text);
+            TextView text = view.findViewById(R.id.text);
             text.setText(Integer.toString(previewSet.getPosition(i) + 1));
         }
     }
@@ -976,7 +974,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void ensurePopMenu() {
-        if (mPopupMenu != null) {
+        if (mPopupMenu != null || mOtherActions == null) {
             return;
         }
 
@@ -985,26 +983,23 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         PopupMenu popup = new PopupMenu(context, mOtherActions, Gravity.TOP);
         mPopupMenu = popup;
         popup.getMenuInflater().inflate(R.menu.scene_gallery_detail, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_open_in_other_app:
-                        String url = getGalleryDetailUrl(false);
-                        Activity activity = getActivity2();
-                        if (null != url && null != activity) {
-                            UrlOpener.openUrl(activity, url, false);
-                        }
-                        break;
-                    case R.id.action_refresh:
-                        if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
-                            adjustViewVisibility(STATE_REFRESH, true);
-                            request();
-                        }
-                        break;
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_open_in_other_app:
+                    String url = getGalleryDetailUrl(false);
+                    Activity activity = getActivity2();
+                    if (null != url && null != activity) {
+                        UrlOpener.openUrl(activity, url, false);
+                    }
+                    break;
+                case R.id.action_refresh:
+                    if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
+                        adjustViewVisibility(STATE_REFRESH, true);
+                        request();
+                    }
+                    break;
             }
+            return true;
         });
     }
 
@@ -1251,7 +1246,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, galleryInfo);
                 intent.putExtra(GalleryActivity.KEY_PAGE, index);
                 startActivity(intent);
-                return;
             }
         }
     }
@@ -1268,20 +1262,17 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         new AlertDialog.Builder(context)
                 .setMessage(getString(R.string.block_the_uploader, uploader))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (DialogInterface.BUTTON_POSITIVE != which) {
-                            return;
-                        }
-
-                        Filter filter = new Filter();
-                        filter.mode = EhFilter.MODE_UPLOADER;
-                        filter.text = uploader;
-                        EhFilter.getInstance().addFilter(filter);
-
-                        showTip(R.string.filter_added, LENGTH_SHORT);
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (DialogInterface.BUTTON_POSITIVE != which) {
+                        return;
                     }
+
+                    Filter filter = new Filter();
+                    filter.mode = EhFilter.MODE_UPLOADER;
+                    filter.text = uploader;
+                    EhFilter.getInstance().addFilter(filter);
+
+                    showTip(R.string.filter_added, LENGTH_SHORT);
                 }).show();
     }
 
@@ -1309,17 +1300,14 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         new AlertDialog.Builder(context)
                 .setTitle(tag)
-                .setItems(R.array.tag_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(tag2), false);
-                                break;
-                            case 1:
-                                addTagFilter(tag);
-                                break;
-                        }
+                .setItems(R.array.tag_menu_entries, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(tag2), false);
+                            break;
+                        case 1:
+                            addTagFilter(tag);
+                            break;
                     }
                 }).show();
     }
@@ -1630,7 +1618,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Nullable
         private Dialog mDialog;
 
-        public void setDialog(@Nullable Dialog dialog, String url) {
+        private void setDialog(@Nullable Dialog dialog, String url) {
+            if (dialog == null) {
+                return;
+            }
             mDialog = dialog;
             mProgressView = (ProgressView) ViewUtils.$$(dialog, R.id.progress);
             mErrorText = (TextView) ViewUtils.$$(dialog, R.id.text);
@@ -1678,7 +1669,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Context context = getContext2();
             MainActivity activity = getActivity2();
-            if (null != context && null != activity && null != mArchiveList && position < mArchiveList.length) {
+            if (null != context && null != activity && mGalleryDetail != null && null != mArchiveList && position < mArchiveList.length) {
                 String res = mArchiveList[position].first;
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
@@ -1745,7 +1736,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Nullable
         private Dialog mDialog;
 
-        public void setDialog(@Nullable Dialog dialog, String url) {
+        private void setDialog(@Nullable Dialog dialog, String url) {
+            if (dialog == null) {
+                return;
+            }
             mDialog = dialog;
             mProgressView = (ProgressView) ViewUtils.$$(dialog, R.id.progress);
             mErrorText = (TextView) ViewUtils.$$(dialog, R.id.text);
@@ -1802,7 +1796,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 r.allowScanningByMediaScanner();
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                dm.enqueue(r);
+                if (dm != null) dm.enqueue(r);
             }
 
             if (mDialog != null) {

@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -48,6 +49,7 @@ public class MaxSizeContainer extends ViewGroup {
         a.recycle();
     }
 
+    @SuppressLint("SwitchIntDef")
     private int getMeasureSpec(int measureSpec, int max) {
         if (max < 0) {
             return measureSpec;

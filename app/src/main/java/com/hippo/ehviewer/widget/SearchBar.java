@@ -139,22 +139,16 @@ public class SearchBar extends FrameLayout implements View.OnClickListener,
         mSuggestionList = new ArrayList<>();
         mSuggestionAdapter = new ArrayAdapter<>(getContext(), R.layout.item_simple_list, mSuggestionList);
         list.setAdapter(mSuggestionAdapter);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
-                mEditText.setText(suggestion);
-                mEditText.setSelection(mEditText.getText().length());
-            }
+        list.setOnItemClickListener((parent, view, position, id) -> {
+            String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
+            mEditText.setText(suggestion);
+            mEditText.setSelection(mEditText.getText().length());
         });
-        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
-                mSearchDatabase.deleteQuery(suggestion);
-                updateSuggestions();
-                return true;
-            }
+        list.setOnItemLongClickListener((parent, view, position, id) -> {
+            String suggestion = mSuggestionList.get(MathUtils.clamp(position, 0, mSuggestionList.size() - 1));
+            mSearchDatabase.deleteQuery(suggestion);
+            updateSuggestions();
+            return true;
         });
     }
 

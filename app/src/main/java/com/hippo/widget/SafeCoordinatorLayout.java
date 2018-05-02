@@ -46,10 +46,18 @@ public class SafeCoordinatorLayout extends CoordinatorLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            performClick();
+        }
         try {
             return super.onTouchEvent(ev);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

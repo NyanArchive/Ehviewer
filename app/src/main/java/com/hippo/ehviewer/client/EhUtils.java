@@ -35,23 +35,23 @@ public class EhUtils {
     public static final int ALL_CATEGORY = EhUtils.UNKNOWN - 1;
     //DOUJINSHI|MANGA|ARTIST_CG|GAME_CG|WESTERN|NON_H|IMAGE_SET|COSPLAY|ASIAN_PORN|MISC;
 
-    public static final int BG_COLOR_DOUJINSHI = 0xfff44336;
-    public static final int BG_COLOR_MANGA = 0xffff9800;
-    public static final int BG_COLOR_ARTIST_CG = 0xfffbc02d;
-    public static final int BG_COLOR_GAME_CG = 0xff4caf50;
-    public static final int BG_COLOR_WESTERN = 0xff8bc34a;
-    public static final int BG_COLOR_NON_H = 0xff2196f3;
-    public static final int BG_COLOR_IMAGE_SET = 0xff3f51b5;
-    public static final int BG_COLOR_COSPLAY = 0xff9c27b0;
-    public static final int BG_COLOR_ASIAN_PORN = 0xff9575cd;
-    public static final int BG_COLOR_MISC = 0xfff06292;
-    public static final int BG_COLOR_UNKNOWN = Color.BLACK;
+    private static final int BG_COLOR_DOUJINSHI = 0xfff44336;
+    private static final int BG_COLOR_MANGA = 0xffff9800;
+    private static final int BG_COLOR_ARTIST_CG = 0xfffbc02d;
+    private static final int BG_COLOR_GAME_CG = 0xff4caf50;
+    private static final int BG_COLOR_WESTERN = 0xff8bc34a;
+    private static final int BG_COLOR_NON_H = 0xff2196f3;
+    private static final int BG_COLOR_IMAGE_SET = 0xff3f51b5;
+    private static final int BG_COLOR_COSPLAY = 0xff9c27b0;
+    private static final int BG_COLOR_ASIAN_PORN = 0xff9575cd;
+    private static final int BG_COLOR_MISC = 0xfff06292;
+    private static final int BG_COLOR_UNKNOWN = Color.BLACK;
 
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff
-    public static final Pattern PATTERN_TITLE_PREFIX = Pattern.compile(
+    private static final Pattern PATTERN_TITLE_PREFIX = Pattern.compile(
             "^(?:(?:\\([^\\)]*\\))|(?:\\[[^\\]]*\\])|(?:\\{[^\\}]*\\})|(?:~[^~]*~)|\\s+)*");
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff and something like ch. 1-23
-    public static final Pattern PATTERN_TITLE_SUFFIX = Pattern.compile(
+    private static final Pattern PATTERN_TITLE_SUFFIX = Pattern.compile(
             "(?:\\s+ch.[\\s\\d-]+)?(?:(?:\\([^\\)]*\\))|(?:\\[[^\\]]*\\])|(?:\\{[^\\}]*\\})|(?:~[^~]*~)|\\s+)*$",
             Pattern.CASE_INSENSITIVE);
 

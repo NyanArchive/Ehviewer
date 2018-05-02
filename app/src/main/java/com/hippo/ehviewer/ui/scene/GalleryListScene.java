@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -226,15 +227,22 @@ public final class GalleryListScene extends BaseScene
         }
 
         String action = args.getString(KEY_ACTION);
-        if (ACTION_HOMEPAGE.equals(action)) {
-            mUrlBuilder.reset();
-        } else if (ACTION_WHATS_HOT.equals(action)) {
-            mUrlBuilder.setMode(ListUrlBuilder.MODE_WHATS_HOT);
-        } else if (ACTION_LIST_URL_BUILDER.equals(action)) {
-            ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
-            if (builder != null) {
-                mUrlBuilder.set(builder);
-            }
+        if (action == null) {
+            return;
+        }
+        switch (action) {
+            case ACTION_HOMEPAGE:
+                mUrlBuilder.reset();
+                break;
+            case ACTION_WHATS_HOT:
+                mUrlBuilder.setMode(ListUrlBuilder.MODE_WHATS_HOT);
+                break;
+            case ACTION_LIST_URL_BUILDER:
+                ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
+                if (builder != null) {
+                    mUrlBuilder.set(builder);
+                }
+                break;
         }
     }
 
@@ -279,7 +287,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
@@ -539,14 +547,11 @@ public final class GalleryListScene extends BaseScene
         final CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(
                 context, getString(R.string.add_quick_search_tip), getString(R.string.get_it), false);
         builder.setTitle(R.string.readme);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (builder.isChecked()) {
-                    Settings.putQuickSearchTip(false);
-                }
-                showAddQuickSearchDialog(adapter, recyclerView, tip);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            if (builder.isChecked()) {
+                Settings.putQuickSearchTip(false);
             }
+            showAddQuickSearchDialog(adapter, recyclerView, tip);
         }).show();
     }
 
@@ -565,10 +570,12 @@ public final class GalleryListScene extends BaseScene
         }
 
         // Check duplicate
-        for (QuickSearch q: mQuickSearchList) {
-            if (urlBuilder.equalsQuickSearch(q)) {
-                showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_SHORT);
-                return;
+        if (mQuickSearchList != null && mQuickSearchList.size() != 0){
+            for (QuickSearch q: mQuickSearchList) {
+                if (urlBuilder.equalsQuickSearch(q)) {
+                    showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_SHORT);
+                    return;
+                }
             }
         }
 
@@ -577,40 +584,37 @@ public final class GalleryListScene extends BaseScene
         builder.setTitle(R.string.add_quick_search_dialog_title);
         builder.setPositiveButton(android.R.string.ok, null);
         final AlertDialog dialog = builder.show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = builder.getText().trim();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String text = builder.getText().trim();
 
-                // Check name empty
-                if (TextUtils.isEmpty(text)) {
-                    builder.setError(getString(R.string.name_is_empty));
+            // Check name empty
+            if (TextUtils.isEmpty(text)) {
+                builder.setError(getString(R.string.name_is_empty));
+                return;
+            }
+
+            // Check name duplicate
+            for (QuickSearch q: mQuickSearchList) {
+                if (text.equals(q.name)) {
+                    builder.setError(getString(R.string.duplicate_name));
                     return;
                 }
+            }
 
-                // Check name duplicate
-                for (QuickSearch q: mQuickSearchList) {
-                    if (text.equals(q.name)) {
-                        builder.setError(getString(R.string.duplicate_name));
-                        return;
-                    }
-                }
+            builder.setError(null);
+            dialog.dismiss();
+            QuickSearch quickSearch = urlBuilder.toQuickSearch();
+            quickSearch.name = text;
+            EhDB.insertQuickSearch(quickSearch);
+            mQuickSearchList.add(quickSearch);
+            adapter.notifyDataSetChanged();
 
-                builder.setError(null);
-                dialog.dismiss();
-                QuickSearch quickSearch = urlBuilder.toQuickSearch();
-                quickSearch.name = text;
-                EhDB.insertQuickSearch(quickSearch);
-                mQuickSearchList.add(quickSearch);
-                adapter.notifyDataSetChanged();
-
-                if (0 == mQuickSearchList.size()) {
-                    tip.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                } else {
-                    tip.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
+            if (0 == mQuickSearchList.size()) {
+                tip.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                tip.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -625,7 +629,7 @@ public final class GalleryListScene extends BaseScene
         Context context = getContext2();
         Assert.assertNotNull(context);
 
-        final EasyRecyclerView recyclerView = (EasyRecyclerView) view.findViewById(R.id.recycler_view_drawer);
+        final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
@@ -634,24 +638,21 @@ public final class GalleryListScene extends BaseScene
         tip.setText(R.string.quick_search_tip);
         toolbar.setTitle(R.string.quick_search);
         toolbar.inflateMenu(R.menu.drawer_gallery_list);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_add:
-                        if (Settings.getQuickSearchTip()) {
-                            showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
-                        } else {
-                            showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
-                        }
-                        break;
-                }
-                return true;
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_add:
+                    if (Settings.getQuickSearchTip()) {
+                        showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
+                    } else {
+                        showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
+                    }
+                    break;
             }
+            return true;
         });
 
-        if (0 == mQuickSearchList.size()) {
+        if (mQuickSearchList == null || mQuickSearchList.size() == 0) {
             tip.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -693,44 +694,42 @@ public final class GalleryListScene extends BaseScene
         public void onBindViewHolder(@NonNull QsDrawerHolder holder, int position) {
             if (mQuickSearchList != null){
                 holder.key.setText(mQuickSearchList.get(position).getName());
-                holder.key.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (null == mHelper || null == mUrlBuilder) {
-                            return;
-                        }
-
-                        mUrlBuilder.set(mQuickSearchList.get(position));
-                        mUrlBuilder.setPageIndex(0);
-                        onUpdateUrlBuilder();
-                        mHelper.refresh();
-                        setState(STATE_NORMAL);
-                        closeDrawer(Gravity.RIGHT);
+                holder.key.setOnClickListener(v -> {
+                    if (null == mHelper || null == mUrlBuilder) {
+                        return;
                     }
+
+                    mUrlBuilder.set(mQuickSearchList.get(position));
+                    mUrlBuilder.setPageIndex(0);
+                    onUpdateUrlBuilder();
+                    mHelper.refresh();
+                    setState(STATE_NORMAL);
+                    closeDrawer(Gravity.RIGHT);
                 });
-                holder.option.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        PopupMenu popupMenu = new PopupMenu(getContext2(), holder.option);
-                        popupMenu.inflate(R.menu.quicksearch_option);
-                        popupMenu.show();
-                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                            final QuickSearch quickSearch = mQuickSearchList.get(position);
-
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                switch (item.getItemId()) {
-                                    case R.id.menu_qs_remove:
-                                        EhDB.deleteQuickSearch(quickSearch);
-                                        mQuickSearchList.remove(position);
-                                        notifyDataSetChanged();
-                                        break;
-                                }
-                                return false;
-                            }
-                        });
+                holder.option.setOnClickListener(v -> {
+                    Context context = getContext2();
+                    if (context == null) {
+                        return;
                     }
+                    PopupMenu popupMenu = new PopupMenu(context, holder.option);
+                    popupMenu.inflate(R.menu.quicksearch_option);
+                    popupMenu.show();
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                        final QuickSearch quickSearch = mQuickSearchList.get(position);
+
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.menu_qs_remove:
+                                    EhDB.deleteQuickSearch(quickSearch);
+                                    mQuickSearchList.remove(position);
+                                    notifyDataSetChanged();
+                                    break;
+                            }
+                            return false;
+                        }
+                    });
                 });
             }
         }
@@ -843,31 +842,28 @@ public final class GalleryListScene extends BaseScene
         final AlertDialog dialog = builder.setTitle(R.string.go_to)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null == mHelper) {
-                    dialog.dismiss();
-                    return;
-                }
-
-                String text = builder.getText().trim();
-                int goTo;
-                try {
-                    goTo = Integer.parseInt(text) - 1;
-                } catch (NumberFormatException e){
-                    builder.setError(getString(R.string.error_invalid_number));
-                    return;
-                }
-                if (goTo < 0 || goTo >= pages) {
-                    builder.setError(getString(R.string.error_out_of_range));
-                    return;
-                }
-                builder.setError(null);
-                mHelper.goTo(goTo);
-                AppHelper.hideSoftInput(dialog);
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (null == mHelper) {
                 dialog.dismiss();
+                return;
             }
+
+            String text = builder.getText().trim();
+            int goTo;
+            try {
+                goTo = Integer.parseInt(text) - 1;
+            } catch (NumberFormatException e){
+                builder.setError(getString(R.string.error_invalid_number));
+                return;
+            }
+            if (goTo < 0 || goTo >= pages) {
+                builder.setError(getString(R.string.error_out_of_range));
+                return;
+            }
+            builder.setError(null);
+            mHelper.goTo(goTo);
+            AppHelper.hideSoftInput(dialog);
+            dialog.dismiss();
         });
     }
 
@@ -919,19 +915,16 @@ public final class GalleryListScene extends BaseScene
         final GalleryInfo gi = mHelper.getDataAt(position);
         new AlertDialog.Builder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
-                .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Download
-                                CommonOperations.startDownload(activity, gi, false);
-                                break;
-                            case 1: // Favorites
-                                CommonOperations.addToFavorites(activity, gi,
-                                        new addToFavoriteListener(context,
-                                                activity.getStageId(), getTag()));
-                                break;
-                        }
+                .setItems(R.array.gallery_list_menu_entries, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Download
+                            CommonOperations.startDownload(activity, gi, false);
+                            break;
+                        case 1: // Favorites
+                            CommonOperations.addToFavorites(activity, gi,
+                                    new addToFavoriteListener(context,
+                                            activity.getStageId(), getTag()));
+                            break;
                     }
                 }).show();
         return true;
@@ -1034,6 +1027,7 @@ public final class GalleryListScene extends BaseScene
         setState(state, true);
     }
 
+    @SuppressLint("SwitchIntDef")
     private void setState(@State int state, boolean animation) {
         if (null == mSearchBar || null == mSearchBarMover ||
                 null == mViewTransition || null == mSearchLayout) {
@@ -1046,69 +1040,85 @@ public final class GalleryListScene extends BaseScene
 
             switch (oldState) {
                 case STATE_NORMAL:
-                    if (state == STATE_SIMPLE_SEARCH) {
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectSearchFab(animation);
-                    } else if (state == STATE_SEARCH) {
-                        mViewTransition.showView(1, animation);
-                        mSearchLayout.scrollSearchContainerToTop();
-                        mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectSearchFab(animation);
-                    } else if (state == STATE_SEARCH_SHOW_LIST) {
-                        mViewTransition.showView(1, animation);
-                        mSearchLayout.scrollSearchContainerToTop();
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectSearchFab(animation);
+                    switch (state) {
+                        case STATE_SIMPLE_SEARCH:
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectSearchFab(animation);
+                            break;
+                        case STATE_SEARCH:
+                            mViewTransition.showView(1, animation);
+                            mSearchLayout.scrollSearchContainerToTop();
+                            mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectSearchFab(animation);
+                            break;
+                        case STATE_SEARCH_SHOW_LIST:
+                            mViewTransition.showView(1, animation);
+                            mSearchLayout.scrollSearchContainerToTop();
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectSearchFab(animation);
+                            break;
                     }
                     break;
                 case STATE_SIMPLE_SEARCH:
-                    if (state == STATE_NORMAL) {
-                        mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectActionFab(animation);
-                    } else if (state == STATE_SEARCH) {
-                        mViewTransition.showView(1, animation);
-                        mSearchLayout.scrollSearchContainerToTop();
-                        mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                    } else if (state == STATE_SEARCH_SHOW_LIST) {
-                        mViewTransition.showView(1, animation);
-                        mSearchLayout.scrollSearchContainerToTop();
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
+                    switch (state) {
+                        case STATE_NORMAL:
+                            mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectActionFab(animation);
+                            break;
+                        case STATE_SEARCH:
+                            mViewTransition.showView(1, animation);
+                            mSearchLayout.scrollSearchContainerToTop();
+                            mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
+                        case STATE_SEARCH_SHOW_LIST:
+                            mViewTransition.showView(1, animation);
+                            mSearchLayout.scrollSearchContainerToTop();
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
                     }
                     break;
                 case STATE_SEARCH:
-                    if (state == STATE_NORMAL) {
-                        mViewTransition.showView(0, animation);
-                        mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectActionFab(animation);
-                    } else if (state == STATE_SIMPLE_SEARCH) {
-                        mViewTransition.showView(0, animation);
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                    } else if (state == STATE_SEARCH_SHOW_LIST) {
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
+                    switch (state) {
+                        case STATE_NORMAL:
+                            mViewTransition.showView(0, animation);
+                            mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectActionFab(animation);
+                            break;
+                        case STATE_SIMPLE_SEARCH:
+                            mViewTransition.showView(0, animation);
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
+                        case STATE_SEARCH_SHOW_LIST:
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
                     }
                     break;
                 case STATE_SEARCH_SHOW_LIST:
-                    if (state == STATE_NORMAL) {
-                        mViewTransition.showView(0, animation);
-                        mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                        selectActionFab(animation);
-                    } else if (state == STATE_SIMPLE_SEARCH) {
-                        mViewTransition.showView(0, animation);
-                        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-                        mSearchBarMover.returnSearchBarPosition();
-                    } else if (state == STATE_SEARCH) {
-                        mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
-                        mSearchBarMover.returnSearchBarPosition();
+                    switch (state) {
+                        case STATE_NORMAL:
+                            mViewTransition.showView(0, animation);
+                            mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            selectActionFab(animation);
+                            break;
+                        case STATE_SIMPLE_SEARCH:
+                            mViewTransition.showView(0, animation);
+                            mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
+                        case STATE_SEARCH:
+                            mSearchBar.setState(SearchBar.STATE_SEARCH, animation);
+                            mSearchBarMover.returnSearchBarPosition();
+                            break;
                     }
                     break;
             }
@@ -1341,6 +1351,7 @@ public final class GalleryListScene extends BaseScene
 
     private class GalleryListHelper extends ContentLayout.ContentHelper<GalleryInfo> {
 
+        @SuppressLint("SwitchIntDef")
         @Override
         protected void getPageData(int taskId, int type, int page) {
             MainActivity activity = getActivity2();
@@ -1349,30 +1360,37 @@ public final class GalleryListScene extends BaseScene
             }
 
             mUrlBuilder.setPageIndex(page);
-            if (ListUrlBuilder.MODE_WHATS_HOT == mUrlBuilder.getMode()) {
-                EhRequest request = new EhRequest();
-                request.setMethod(EhClient.METHOD_GET_WHATS_HOT);
-                request.setCallback(new GetWhatsHotListener(getContext(),
-                        activity.getStageId(), getTag(), taskId));
-                request.setArgs();
-                mClient.execute(request);
-            } else if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.getMode()) {
-                EhRequest request = new EhRequest();
-                request.setMethod(EhClient.METHOD_IMAGE_SEARCH);
-                request.setCallback(new GetGalleryListListener(getContext(),
-                        activity.getStageId(), getTag(), taskId));
-                request.setArgs(new File(StringUtils.avoidNull(mUrlBuilder.getImagePath())),
-                        mUrlBuilder.isUseSimilarityScan(),
-                        mUrlBuilder.isOnlySearchCovers(), mUrlBuilder.isShowExpunged());
-                mClient.execute(request);
-            } else {
-                String url = mUrlBuilder.build();
-                EhRequest request = new EhRequest();
-                request.setMethod(EhClient.METHOD_GET_GALLERY_LIST);
-                request.setCallback(new GetGalleryListListener(getContext(),
-                        activity.getStageId(), getTag(), taskId));
-                request.setArgs(url);
-                mClient.execute(request);
+            switch (mUrlBuilder.getMode()) {
+                case ListUrlBuilder.MODE_WHATS_HOT: {
+                    EhRequest request = new EhRequest();
+                    request.setMethod(EhClient.METHOD_GET_WHATS_HOT);
+                    request.setCallback(new GetWhatsHotListener(getContext(),
+                            activity.getStageId(), getTag(), taskId));
+                    request.setArgs();
+                    mClient.execute(request);
+                    break;
+                }
+                case ListUrlBuilder.MODE_IMAGE_SEARCH: {
+                    EhRequest request = new EhRequest();
+                    request.setMethod(EhClient.METHOD_IMAGE_SEARCH);
+                    request.setCallback(new GetGalleryListListener(getContext(),
+                            activity.getStageId(), getTag(), taskId));
+                    request.setArgs(new File(StringUtils.avoidNull(mUrlBuilder.getImagePath())),
+                            mUrlBuilder.isUseSimilarityScan(),
+                            mUrlBuilder.isOnlySearchCovers(), mUrlBuilder.isShowExpunged());
+                    mClient.execute(request);
+                    break;
+                }
+                default: {
+                    String url = mUrlBuilder.build();
+                    EhRequest request = new EhRequest();
+                    request.setMethod(EhClient.METHOD_GET_GALLERY_LIST);
+                    request.setCallback(new GetGalleryListListener(getContext(),
+                            activity.getStageId(), getTag(), taskId));
+                    request.setArgs(url);
+                    mClient.execute(request);
+                    break;
+                }
             }
         }
 
