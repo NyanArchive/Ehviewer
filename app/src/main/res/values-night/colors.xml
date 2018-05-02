@@ -2,8 +2,8 @@
 <resources>
     <color name="primary_drawable_light">#ffffffff</color>
 
-    <color name="colorPrimary">@color/grey_800</color>
-    <color name="colorPrimaryDark">@color/grey_900</color>
+    <color name="colorPrimary">@color/grey_hex_1f</color>
+    <color name="colorPrimaryDark">@color/grey_hex_15</color>
 
     <color name="secondary_text_default_light">#61ffffff</color>
     <color name="secondary_text_default_dark">#de000000</color>
@@ -13,9 +13,14 @@
     <color name="background">@color/background_dark</color>
     <color name="background_selected">@color/grey_900</color>
     <color name="foreground_selected">#24ffffff</color>
+    <color name="background_card">@color/grey_hex_1f</color>
 
     <color name="primary_icon">@color/grey_300</color>
 
     <color name="nav_item_icon">@color/grey_400</color>
     <color name="nav_item_text">@android:color/white</color>
+
+    <color name="big_icon">#2fffffff</color>
+
+    <color name="lock_pattern_view_regular_color">#8affffff</color>
 </resources>

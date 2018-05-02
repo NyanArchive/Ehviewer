@@ -144,8 +144,14 @@
     </style>
 
     <style name="Custom.Widget.CardView" parent="CardView">
+        <item name="cardBackgroundColor">@color/background_card</item>
         <item name="cardCornerRadius">3dp</item>
         <item name="cardUseCompatPadding">true</item>
+    </style>
+
+    <style name="Custom.Widget.AppCompat.PopupMenu" parent="Widget.AppCompat.Light.PopupMenu">
+        <item name="android:popupBackground">@color/background_light</item>
+        <item name="android:popupElevation">4dp</item>
     </style>
 
 </resources>

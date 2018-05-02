@@ -31,6 +31,7 @@ import android.webkit.MimeTypeMap;
 
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.GetResponseData;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -85,7 +86,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import static com.hippo.util.ExceptionUtils.getResponseData;
 
 public final class SpiderQueen implements Runnable {
 
@@ -741,7 +741,7 @@ public final class SpiderQueen implements Runnable {
             Request request = new EhRequestBuilder(EhUrl.getGalleryDetailUrl(
                     mGalleryInfo.gid, mGalleryInfo.token, 0, false), config).build();
             Response response = mHttpClient.newCall(request).execute();
-            String data = getResponseData(response);
+            String data = GetResponseData.getResponseData(response);;
             spiderInfo.pages = GalleryDetailParser.parsePages(data);
             spiderInfo.pTokenMap = new SparseArray<>(spiderInfo.pages);
             readPreviews(data, 0, spiderInfo);
@@ -774,7 +774,7 @@ public final class SpiderQueen implements Runnable {
             }
             Request request = new EhRequestBuilder(url, config).build();
             Response response = mHttpClient.newCall(request).execute();
-            String data = getResponseData(response);
+            String data = GetResponseData.getResponseData(response);;
             readPreviews(data, previewIndex, spiderInfo);
 
             // Save to local

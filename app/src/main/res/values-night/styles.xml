@@ -4,4 +4,10 @@
         <item name="android:textSize">@dimen/text_little_small</item>
         <item name="android:textColor">@color/primary_text_dark</item>
     </style>
+
+    <style name="Custom.Widget.AppCompat.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/background_dark</item>
+        <item name="android:popupElevation">4dp</item>
+    </style>
+
 </resources>

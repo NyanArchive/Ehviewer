@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId "com.hippo.ehviewer_mash"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 86
         versionName "1.0.33"

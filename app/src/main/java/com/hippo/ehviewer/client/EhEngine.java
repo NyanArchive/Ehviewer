@@ -22,6 +22,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.GetResponseData;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -73,8 +74,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.hippo.util.ExceptionUtils.getResponseData;
-
 public class EhEngine {
 
     private static final String TAG = EhEngine.class.getSimpleName();
@@ -83,12 +82,12 @@ public class EhEngine {
     private static final String SAD_PANDA_TYPE = "image/gif";
     private static final String SAD_PANDA_LENGTH = "9615";
 
-    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
 
     private static final Pattern PATTERN_NEED_HATH_CLIENT = Pattern.compile("(You must have a H@H client assigned to your account to use this feature\\.)");
 
-    public static EhFilter sEhFilter;
+    private static EhFilter sEhFilter;
 
     public static void initialize() {
         sEhFilter = EhFilter.getInstance();
@@ -154,7 +153,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);
             return SignInParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -181,7 +180,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);
             result = GalleryListParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -270,7 +269,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             GalleryApiParser.parse(data, galleryInfoList);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -296,7 +295,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return GalleryDetailParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -323,7 +322,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return Pair.create(GalleryDetailParser.parsePreviewSet(data),
                     GalleryDetailParser.parsePreviewPages(data));
         } catch (Exception e) {
@@ -362,7 +361,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return RateGalleryParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -392,7 +391,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             Document document = Jsoup.parse(data);
 
             Elements elements = document.select("#chd + p");
@@ -433,7 +432,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return GalleryTokenApiParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -460,7 +459,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             result = FavoritesParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -517,7 +516,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             throwException(call, code, headers, data, null);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -571,7 +570,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             result = FavoritesParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -608,7 +607,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             result = TorrentParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -637,7 +636,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             result = ArchiveParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -676,7 +675,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             throwException(call, code, headers, data, null);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -711,7 +710,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             list = WhatsHotParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -748,7 +747,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return ProfileParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -775,7 +774,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return getProfileInternal(task, okHttpClient, ForumsParser.parse(data));
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -813,7 +812,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return VoteCommentParser.parse(data, commentVote);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -877,7 +876,7 @@ public class EhEngine {
 
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             result = GalleryListParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);
@@ -935,7 +934,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            data = getResponseData(response);
+            data = GetResponseData.getResponseData(response);;
             return GalleryPageParser.parse(data);
         } catch (Exception e) {
             throwException(call, code, headers, data, e);

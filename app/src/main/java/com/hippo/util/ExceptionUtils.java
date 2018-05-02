@@ -32,12 +32,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-
 public final class ExceptionUtils {
-
-    private static final String TAG = ExceptionUtils.class.getSimpleName();
 
     @NonNull
     public static String getReadableString(@NonNull Exception e) {
@@ -66,18 +61,5 @@ public final class ExceptionUtils {
         } else {
             return GetText.getString(R.string.error_unknown);
         }
-    }
-
-    public static String getResponseData(Response response) {
-        String data = null;
-        ResponseBody body = response.body();
-        try {
-            if (body != null) {
-                data = body.string();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return data;
     }
 }

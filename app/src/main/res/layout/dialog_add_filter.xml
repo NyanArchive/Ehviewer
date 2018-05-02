@@ -20,9 +20,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="?android:attr/dialogPreferredPadding"
+    android:paddingLeft="?attr/dialogPreferredPadding"
     android:paddingTop="@dimen/dialog_padding_top_material"
-    android:paddingRight="?android:attr/dialogPreferredPadding">
+    android:paddingRight="?attr/dialogPreferredPadding">
 
     <com.hippo.widget.CuteSpinner
         android:id="@+id/spinner"

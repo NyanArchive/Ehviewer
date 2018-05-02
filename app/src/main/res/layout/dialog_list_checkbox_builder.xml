@@ -41,8 +41,8 @@
         android:id="@+id/checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="?android:attr/dialogPreferredPadding"
-        android:layout_marginRight="?android:attr/dialogPreferredPadding"
+        android:layout_marginLeft="?attr/dialogPreferredPadding"
+        android:layout_marginRight="?attr/dialogPreferredPadding"
         android:layout_marginBottom="@dimen/dialog_padding_top_material"/>
 
 </LinearLayout>

@@ -38,10 +38,11 @@
     <color name="secondary_text_disabled_light">#24000000</color>
 
     <color name="background">@color/background_light</color>
-    <color name="background_dark">#ff303030</color>
+    <color name="background_dark">@color/grey_hex_15</color>
     <color name="background_light">@color/grey_50</color>
     <color name="background_selected">@color/grey_300</color>
     <color name="foreground_selected">#24000000</color>
+    <color name="background_card">@color/background_light</color>
 
     <color name="red_500">#fff44336</color>
     <color name="teal_500">#ff009688</color>
@@ -54,6 +55,7 @@
     <color name="light_green_600">#ff7cb342</color>
     <color name="yellow_800">#fff9a825</color>
     <color name="deep_orange_400">#ffff7043</color>
+
     <color name="grey_900">#ff212121</color>
     <color name="grey_800">#ff424242</color>
     <color name="grey_700">#ff616161</color>
@@ -64,6 +66,11 @@
     <color name="grey_200">#ffeeeeee</color>
     <color name="grey_100">#fff5f5f5</color>
     <color name="grey_50">#fffafafa</color>
+
+    <color name="grey_hex_10">#101010</color>
+    <color name="grey_hex_15">#151515</color>
+    <color name="grey_hex_1f">#1f1f1f</color>
+
     <color name="brown_500">#ff795548</color>
 
     <color name="colorPrimary">@color/teal_500</color>

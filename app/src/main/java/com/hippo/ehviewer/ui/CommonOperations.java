@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -29,6 +28,7 @@ import android.util.Log;
 import com.hippo.app.ListCheckBoxDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
+import com.hippo.ehviewer.GetResponseData;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.UrlOpener;
@@ -41,7 +41,6 @@ import com.hippo.ehviewer.download.DownloadService;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.text.Html;
 import com.hippo.unifile.UniFile;
-import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 
@@ -95,7 +94,7 @@ public final class CommonOperations {
                 Request request = new Request.Builder().url(url).build();
                 Response response = mHttpClient.newCall(request).execute();
                 if (response.isSuccessful()){
-                    return new JSONObject(ExceptionUtils.getResponseData(response));
+                    return new JSONObject(GetResponseData.getResponseData(response));
                 }
                 return null;
             } catch (IOException | JSONException e) {

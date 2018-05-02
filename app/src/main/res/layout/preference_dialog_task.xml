@@ -20,10 +20,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="?android:attr/dialogPreferredPadding"
+    android:paddingLeft="?attr/dialogPreferredPadding"
     android:paddingTop="@dimen/dialog_padding_top_material"
     android:paddingBottom="@dimen/dialog_padding_top_material"
-    android:paddingRight="?android:attr/dialogPreferredPadding">
+    android:paddingRight="?attr/dialogPreferredPadding">
 
     <com.hippo.widget.ProgressView
         android:layout_width="wrap_content"
