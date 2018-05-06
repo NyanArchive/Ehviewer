@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -359,6 +360,8 @@ public class HistoryScene extends ToolbarScene
             // Update transition name
             long gid = gi.gid;
             holder.thumb.setTransitionName(TransitionNameFactory.getThumbTransitionName(gid));
+
+            holder.setMaxRightSwipeAmount(0);
         }
 
         @Override
@@ -378,9 +381,12 @@ public class HistoryScene extends ToolbarScene
         public SwipeResultAction onSwipeItem(HistoryHolder holder, int position, int result) {
             switch (result) {
                 case SwipeableItemConstants.RESULT_SWIPED_LEFT:
-                case SwipeableItemConstants.RESULT_SWIPED_RIGHT:
                     return new SwipeResultActionClear(position);
+                case SwipeableItemConstants.RESULT_SWIPED_RIGHT:
+                    openDrawer(Gravity.LEFT);
+                    return new SwipeResultActionDefault();
                 case SwipeableItemConstants.RESULT_CANCELED:
+                    return new SwipeResultActionDefault();
                 default:
                     return new SwipeResultActionDefault();
             }
