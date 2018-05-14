@@ -521,7 +521,7 @@ public final class SpiderQueen implements Runnable {
                 } else {
                     size = Integer.MAX_VALUE;
                 }
-                for (int i = index + 1, n = index + i + mPreloadNumber; i < n && i < size; i++) {
+                for (int i = index + 1, n = index + 1 + mPreloadNumber; i < n && i < size; i++) {
                     if (STATE_NONE == getPageState(i)) {
                         mRequestPageQueue2.add(i);
                     }
@@ -1049,6 +1049,8 @@ public final class SpiderQueen implements Runnable {
             String pageUrl = null;
             boolean interrupt = false;
             boolean leakSkipHathKey = false;
+
+            Log.d("TAG", "index = " + index);
 
             // Try twice
             for (int i = 0; i < 5; i++) {
