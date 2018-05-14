@@ -18,10 +18,12 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="@drawable/selectable_item_foreground"
-    style="@style/Custom.Widget.CardView">
+    style="@style/Custom.Widget.CardView"
+    tools:ignore="RelativeOverlap,RtlHardcoded,RtlSymmetry,ContentDescription">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -41,7 +43,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="4dp"
-            android:layout_toRightOf="@id/thumb"/>
+            android:layout_toRightOf="@id/thumb" />
 
         <TextView
             android:id="@+id/uploader"

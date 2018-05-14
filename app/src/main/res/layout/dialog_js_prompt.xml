@@ -16,23 +16,25 @@
   -->
 
 <LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:padding="@dimen/keyline_margin">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/keyline_margin">
 
   <TextView
-    android:id="@+id/message"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
+      android:id="@+id/message"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
   <EditText
-    android:id="@+id/value"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/keyline_margin"
-    android:inputType="text"/>
+      android:id="@+id/value"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/keyline_margin"
+      android:inputType="text"
+      tools:ignore="LabelFor" />
 
 </LinearLayout>

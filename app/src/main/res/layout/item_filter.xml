@@ -17,6 +17,7 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false">
@@ -30,13 +31,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
 
             <ImageView
                 android:id="@+id/icon"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:padding="12dp"/>
+                android:padding="12dp"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/text"

@@ -16,41 +16,44 @@
   -->
 
 <FrameLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="RtlHardcoded">
 
   <com.hippo.easyrecyclerview.EasyRecyclerView
-    android:id="@+id/recycler_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipToPadding="false"/>
+      android:id="@+id/recycler_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"/>
 
   <TextView
-    android:id="@+id/tip"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:gravity="center"
-    android:textSize="@dimen/text_super_large"
-    android:text="@string/hosts_tip"/>
-
-  <com.hippo.widget.FabLayout
-    android:id="@+id/fab_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingRight="@dimen/corner_fab_margin"
-    android:paddingBottom="@dimen/corner_fab_margin">
-
-    <android.support.design.widget.FloatingActionButton
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      android:id="@+id/fab"
+      android:id="@+id/tip"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:srcCompat="@drawable/v_plus_dark_x24"
-      app:backgroundTint="?android:attr/colorPrimary"
-      style="@style/Widget.Design.FloatingActionButton"/>
+      android:layout_gravity="center"
+      android:gravity="center"
+      android:textSize="@dimen/text_super_large"
+      android:text="@string/hosts_tip"/>
+
+  <com.hippo.widget.FabLayout
+      android:id="@+id/fab_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingRight="@dimen/corner_fab_margin"
+      android:paddingBottom="@dimen/corner_fab_margin"
+      tools:ignore="RtlSymmetry">
+
+    <android.support.design.widget.FloatingActionButton
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/v_plus_dark_x24"
+        app:backgroundTint="?android:attr/colorPrimary"
+        style="@style/Widget.Design.FloatingActionButton"/>
 
   </com.hippo.widget.FabLayout>
 </FrameLayout>
