@@ -499,7 +499,6 @@ public class FavoritesScene extends BaseScene implements
 
         EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
 
         mDrawerAdapter = new FavDrawerAdapter(inflater);
         recyclerView.setAdapter(mDrawerAdapter);

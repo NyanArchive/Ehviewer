@@ -571,7 +571,6 @@ public class DownloadsScene extends ToolbarScene
         mLabelAdapter = new DownloadLabelAdapter(inflater);
         final EasyRecyclerView recyclerView =  view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(mLabelAdapter);
 
         return view;

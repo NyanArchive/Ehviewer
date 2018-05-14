@@ -631,7 +631,6 @@ public final class GalleryListScene extends BaseScene
 
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
         recyclerView.setAdapter(qsDrawerAdapter);
         mQuickSearchList = EhDB.getAllQuickSearch();
