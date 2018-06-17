@@ -17,6 +17,9 @@
 package com.hippo.ehviewer.ui;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -32,17 +35,18 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
+import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
@@ -77,7 +81,6 @@ import com.hippo.widget.LoadImageView;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ResourcesUtils;
 import com.hippo.yorozuya.ViewUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,6 +94,7 @@ public final class MainActivity extends StageActivity
     private static final int REQUEST_CODE_SETTINGS = 0;
 
     private static final String KEY_NAV_CHECKED_ITEM = "nav_checked_item";
+    private static final String KEY_CLIP_TEXT = "clip_text";
 
     /*---------------
      Whole life cycle
@@ -107,6 +111,8 @@ public final class MainActivity extends StageActivity
     private TextView mDisplayName;
 
     private int mNavCheckedItem = 0;
+
+    private String mClipText = null;
 
     static {
         registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -347,16 +353,20 @@ public final class MainActivity extends StageActivity
         // Check permission
         PermissionRequester.request(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 getString(R.string.write_rationale), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+        mClipText = Settings.getClipboardText();
     }
 
     private void onRestore(Bundle savedInstanceState) {
         mNavCheckedItem = savedInstanceState.getInt(KEY_NAV_CHECKED_ITEM);
+        mClipText = savedInstanceState.getString(KEY_CLIP_TEXT);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         outState.putInt(KEY_NAV_CHECKED_ITEM, mNavCheckedItem);
+        outState.putString(KEY_CLIP_TEXT, mClipText);
     }
 
     @Override
@@ -375,6 +385,46 @@ public final class MainActivity extends StageActivity
         super.onResume();
 
         setNavCheckedItem(mNavCheckedItem);
+
+        checkClipboardUrl();
+    }
+
+    private String getTextFromClipboard() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                ClipData clip = clipboard.getPrimaryClip();
+                if (clip.getItemCount() > 0) {
+                    return clip.getItemAt(0).getText().toString();
+                }
+            }
+        return null;
+    }
+
+    private void checkClipboardUrl() {
+        String text = getTextFromClipboard();
+
+        if (text != null && !text.equals(mClipText)) {
+            Pair<Long, String> pair = EhUrl.parseGalleryDetailUrl(text);
+            if (pair != null) {
+                long gid = pair.first;
+                String token = pair.second;
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.clipboard_gallery_url_dialog_title)
+                        .setMessage(R.string.clipboard_gallery_url_dialog_message)
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            Bundle args = new Bundle();
+                            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
+                            args.putLong(GalleryDetailScene.KEY_GID, gid);
+                            args.putString(GalleryDetailScene.KEY_TOKEN, token);
+                            startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
+                        })
+                        .show();
+            }
+        }
+
+        mClipText = text;
+        Settings.putClipboardText(text);
     }
 
     @Override
@@ -396,7 +446,7 @@ public final class MainActivity extends StageActivity
         if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
             BaseScene baseScene = (BaseScene) scene;
             mRightDrawer.removeAllViews();
-            View drawerView = baseScene.onCreateDrawerView(
+            View drawerView = baseScene.createDrawerView(
                     baseScene.getLayoutInflater2(), mRightDrawer, savedInstanceState);
             if (drawerView != null) {
                 mRightDrawer.addView(drawerView);
@@ -413,7 +463,7 @@ public final class MainActivity extends StageActivity
 
         if (scene instanceof BaseScene) {
             BaseScene baseScene = (BaseScene) scene;
-            baseScene.onDestroyDrawerView();
+            baseScene.destroyDrawerView();
         }
     }
 
