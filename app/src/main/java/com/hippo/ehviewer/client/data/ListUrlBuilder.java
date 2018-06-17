@@ -228,7 +228,6 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     /**
      * @param query xxx=yyy&mmm=nnn
      */
-    // TODO page
     public void setQuery(String query) {
         reset();
 

@@ -50,6 +50,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnCheckedChangeListener,
         View.OnClickListener, ImageSearchLayout.Helper {
@@ -210,7 +211,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     public void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             final Bundle savedState = (Bundle) state;
-            super.onRestoreInstanceState(savedState.getParcelable(STATE_KEY_SUPER));
+            super.onRestoreInstanceState(Objects.requireNonNull(savedState.getParcelable(STATE_KEY_SUPER)));
             mSearchMode = savedState.getInt(STATE_KEY_SEARCH_MODE);
             mEnableAdvance = savedState.getBoolean(STATE_KEY_ENABLE_ADVANCE);
         }

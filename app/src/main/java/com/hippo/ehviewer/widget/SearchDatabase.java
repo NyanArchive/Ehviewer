@@ -144,11 +144,7 @@ public final class SearchDatabase {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TABLE_SUGGESTIONS + " (" +
-                    "_id INTEGER PRIMARY KEY" +
-                    "," + COLUMN_QUERY + " TEXT" +
-                    "," + COLUMN_DATE + " LONG" +
-                    ");");
+            db.execSQL(String.format("CREATE TABLE %s (_id INTEGER PRIMARY KEY,%s TEXT,%s LONG);", TABLE_SUGGESTIONS, COLUMN_QUERY, COLUMN_DATE));
         }
 
         @Override
