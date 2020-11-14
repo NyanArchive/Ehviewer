@@ -35,7 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
-import androidx.drawerlayout.widget.DrawerLayout;
+import com.hippo.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hippo.android.resource.AttrResources;

@@ -25,7 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.hippo.widget.DrawerLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.yorozuya.LayoutUtils;

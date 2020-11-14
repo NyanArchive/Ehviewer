@@ -143,4 +143,6 @@
     <dimen name="gallery_page_text_size">56sp</dimen>
     <dimen name="gallery_error_text_size">24sp</dimen>
 
+    <dimen name="def_drawer_elevation">10dp</dimen>
+
 </resources>
